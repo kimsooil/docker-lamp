@@ -26,4 +26,5 @@ while offline:
         else:
             # otherwise we probably got a password error of some sort, but it does mean we're online!
             offline = False
+            print("PostgreSQL ready to go.")
 exit(0)

@@ -19,9 +19,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
-from dcc.views import HomeView, AboutView, HelpView
-
-from dcc.views import ExampleAuthenticatedView, ExampleView
+from .views import HomeView, AboutView, HelpView
+from .views import ExampleAuthenticatedView, ExampleView
 
 urlpatterns = [
     path('admin/', admin.site.urls),

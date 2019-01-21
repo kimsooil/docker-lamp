@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-import os.environ as ENV
+from os import environ as ENV
 
 # import environ
 
@@ -101,7 +101,7 @@ DATABASES = {
         'NAME': ENV['DATABASE_NAME'],
         'USER': ENV['DATABASE_USER'],
         'PASSWORD': ENV['DATABASE_PASSWORD'],
-        'HOST': '127.0.0.1',
+        'HOST': 'postgresdb',
         'PORT': '5432',
     }
 }

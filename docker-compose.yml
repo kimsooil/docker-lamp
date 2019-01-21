@@ -4,9 +4,10 @@ volumes:
     postgres_data:
     
 services:
-    db:
+    postgresdb:
         build: docker_postgres/.
         image: postgresql_database:latest
+        restart: always
         ports: # IMPORTANT: Make sure to use 127.0.0.1 to keep it local. Otherwise, this will be broadcast to the web.
             - 127.0.0.1:5432:5432
         environment:
@@ -23,8 +24,11 @@ services:
         ports: # IMPORTANT: Make sure to use 127.0.0.1 to keep it local. Otherwise, this will be broadcast to the web.
             - 127.0.0.1:8000:8000
         depends_on:
-            - db
-        environment: # NOTE: Without 
+            - postgresdb
+        environment: # NOTE: Without
+            - DATABASE_USER
+            - DATABASE_PASSWORD
+            - DATABASE_NAME
             - DJANGO_SETTINGS_MODULE
         links:
-            - "db"
+            - "postgresdb"

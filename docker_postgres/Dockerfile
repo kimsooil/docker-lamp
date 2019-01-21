@@ -10,8 +10,11 @@ FROM postgres:9.6
 COPY setup_database.sh /docker-entrypoint-initdb.d/setup_database.sh
 RUN chmod +x /docker-entrypoint-initdb.d/setup_database.sh
 
+# COPY setup_database.sh /tmp/setup_database.sh
+# RUN bash /tmp/setup_database.sh
+
 # Expose port 5432 so we can connect to it from outside the container
-EXPOSE 5432
+# EXPOSE 5432
 
 # Be sure to switch to the "postgres" user so we can run the above script and start the service
 USER postgres
