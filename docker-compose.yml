@@ -20,7 +20,7 @@ services:
         build: .
         image: django_web:latest
         volumes:
-            - .:/svr/
+            - .:/app/
         ports: # IMPORTANT: Make sure to use 127.0.0.1 to keep it local. Otherwise, this will be broadcast to the web.
             - 127.0.0.1:8000:8000
         depends_on:
