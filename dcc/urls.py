@@ -24,9 +24,9 @@ from .views import ExampleAuthenticatedView, ExampleView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', HomeView.as_view()),
-    path('about/', AboutView.as_view()),
-    path('help/', HelpView.as_view()),
+    path('', HomeView.as_view(), name='home'),
+    path('about/', AboutView.as_view(), name='about'),
+    path('help/', HelpView.as_view(), name='help'),
 
 
     # Example DRF views.

@@ -1,0 +1,14 @@
+kind: pipeline
+name: default
+
+workspace:
+  base: /go
+  path: src/github.com/crcresearch/dcc
+
+steps:
+  - name: flake8
+    image: python:3
+    commands:
+     - pip install -r requirements/base.txt
+     - pip install -r requirements/development.txt
+     - flake8 dcc --max-line-length=120 --exclude dcc/migrations
