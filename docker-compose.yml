@@ -3,21 +3,32 @@
 version: '3'
 
 volumes:
-    postgres_data:
+    pgdata:
     
 services:
     postgresdb:
-        build: docker_postgres/.
-        image: postgresql_database:latest
-        restart: always
-        ports: # IMPORTANT: Make sure to use 127.0.0.1 to keep it local. Otherwise, this will be broadcast to the web.
-            - 127.0.0.1:5432:5432
+        image: postgres:9.6-alpine
         environment:
-            - DATABASE_USER
-            - DATABASE_PASSWORD
-            - DATABASE_NAME
-        volumes: # <- important!  the `/var/lib/postgresql/data` mounting point for your container is where postgresql's default data location is!
-            - postgres_data:/var/lib/postgresql/data
+            - POSTGRES_DB
+            - POSTGRES_USER
+            - POSTGRES_PASSWORD
+        restart: unless-stopped
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+        ports:
+            - "127.0.0.1:5432:5432"
+        # # build: ./docker_postgres
+        # # image: postgresql_database:latest
+        # image: postgres:9.6-alpine
+        # restart: always
+        # ports: # IMPORTANT: Make sure to use 127.0.0.1 to keep it local. Otherwise, this will be broadcast to the web.
+        #     - 127.0.0.1:5432:5432
+        # environment:
+        #     - POSTGRES_DB
+        #     - POSTGRES_USER
+        #     - POSTGRES_PASSWORD
+        # volumes: # <- important!  the `/var/lib/postgresql/data` mounting point for your container is where postgresql's default data location is!
+        #     - postgres_data:/var/lib/postgresql/data
     web:
         build: .
         image: django_web:latest
@@ -28,9 +39,9 @@ services:
         depends_on:
             - postgresdb
         environment: # NOTE: Without
-            - DATABASE_USER
-            - DATABASE_PASSWORD
-            - DATABASE_NAME
+            - POSTGRES_DB
+            - POSTGRES_USER
+            - POSTGRES_PASSWORD
             - DJANGO_SETTINGS_MODULE
         links:
             - "postgresdb"

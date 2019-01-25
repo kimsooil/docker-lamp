@@ -91,9 +91,9 @@ WSGI_APPLICATION = 'dcc.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': ENV['DATABASE_NAME'],
-        'USER': ENV['DATABASE_USER'],
-        'PASSWORD': ENV['DATABASE_PASSWORD'],
+        'NAME': ENV['POSTGRES_DB'],
+        'USER': ENV['POSTGRES_USER'],
+        'PASSWORD': ENV['POSTGRES_PASSWORD'],
         'HOST': 'postgresdb',
         'PORT': '5432',
     }
