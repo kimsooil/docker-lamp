@@ -29,5 +29,5 @@ RUN chmod +x /app/wait_for_postgres.sh
 ENTRYPOINT ["/app/wait_for_postgres.sh"]
 
 # Start the server:
-# CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
-CMD ["python3", "manage.py", "runserver", "127.0.0.1:8000"]
+CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+# CMD ["python3", "manage.py", "runserver", "127.0.0.1:8000"]
