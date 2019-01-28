@@ -53,10 +53,15 @@ INSTALLED_APPS = [
     # ---------------------------
     # Django Rest Framework.
     'rest_framework',
+    'rest_framework_swagger',
 
     # Allows for generating.
     'django_generate_secret_key'
 ]
+
+# # If not production, add rest framework.
+# if not ENV['ENVIRONMENT'] == 'production':
+#     INSTALLED_APPS.append('rest_framework_swagger')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
