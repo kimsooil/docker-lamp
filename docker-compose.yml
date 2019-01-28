@@ -43,5 +43,7 @@ services:
             - POSTGRES_USER
             - POSTGRES_PASSWORD
             - DJANGO_SETTINGS_MODULE
+            - ENVIRONMENT
+            - SECRET_KEY
         links:
             - "postgresdb"

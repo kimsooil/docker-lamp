@@ -2,7 +2,10 @@
 
 # call the python script that uses pyscopg2 to check for database connections
 # NOTE: we pass in "db" as a parameter since this is the hostname Docker sets for us (in the docker-compose.yml)
-python wait_for_postgres.py db
+
+bash wait_for_postgres.sh
+
+bash generate_secret_key.sh
 
 # Execute anything in the "CMD" definition
 exec "$@"

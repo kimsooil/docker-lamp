@@ -51,7 +51,7 @@ NOTE: These will be run against the *django* container.
 
 ### Docker
 
-docker exec -it django_container python3 manage.py test
+*docker exec django_container* python3 manage.py test
 
 ### docker-compose
 

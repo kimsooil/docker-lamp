@@ -11,25 +11,30 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-# import environ
-
-# env = environ.Env()
-
-for env in os.environ.keys():
-    print(env, ':', os.environ[env])
+from os import environ as ENV
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Use this one if dcc/development.py
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Use this if dcc/settings/development.py
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'qezyue5wcapkr@5d(_-n4pxo!(gjkr*kcpve)r@4m*6o$wx$jm'
+# SECRET_KEY = 'qezyue5wcapkr@5d(_-n4pxo!(gjkr*kcpve)r@4m*6o$wx$jm'
+# Use a separate file for the secret key
+with open(os.path.join(BASE_DIR, 'secretkey.txt')) as f:
+    SECRET_KEY = f.read().strip()
+    print ('SECRET_KEYSECRET_KEYSECRET_KEYSECRET_KEYSECRET_KEYSECRET_KEYSECRET_KEYSECRET_KEY', SECRET_KEY)
+
+# SECRET_KEY = ENV['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False if ENV['ENVIRONMENT'] == 'production' else True
 
 ALLOWED_HOSTS = []
 
@@ -45,8 +50,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
 
+    # ---------------------------
     # Django Rest Framework.
-    'rest_framework'
+    'rest_framework',
+
+    # Allows for generating.
+    'django_generate_secret_key'
 ]
 
 MIDDLEWARE = [
@@ -85,13 +94,24 @@ WSGI_APPLICATION = 'dcc.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
+# Local settings file which is not added to the repository. Use this for saving passwords.
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': ENV['POSTGRES_DB'],
+        'USER': ENV['POSTGRES_USER'],
+        'PASSWORD': ENV['POSTGRES_PASSWORD'],
+        'HOST': 'postgresdb',
+        'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

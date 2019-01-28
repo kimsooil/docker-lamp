@@ -24,9 +24,11 @@ EXPOSE 8000
 # # Set the entry point script
 # ADD wait_for_postgres.sh /code/
 # ADD wait_for_postgres.py /code/
+RUN chmod +x /app/init.sh
 RUN chmod +x /app/wait_for_postgres.sh
+RUN chmod +x /app/generate_secret_key.sh
 
-ENTRYPOINT ["/app/wait_for_postgres.sh"]
+ENTRYPOINT ["/app/init.sh"]
 
 # Start the server:
 CMD ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
