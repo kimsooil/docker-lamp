@@ -72,3 +72,13 @@ Running flake8 to check code for things.
 ```sh
 docker exec container-name flake8 app --max-line-length=120 [--exclude] [directory/to/exclude]
 ```
+
+## Wagtail
+
+This is a good summary of how wagtail is being used in the project [https://docs.wagtail.io/en/v2.4/getting_started/integrating_into_django.html]
+
+### Getting Started
+
+Wagtail is already installed. It can be disabled whenever needed.
+
+**NOTE:** Migrations will be run 

@@ -38,6 +38,8 @@ DEBUG = False if ENV['ENVIRONMENT'] == 'production' else True
 
 ALLOWED_HOSTS = []
 
+# Wagtail.
+WAGTAIL_SITE_NAME = 'Django Cookie Cutter!'
 
 # Application definition
 
@@ -56,7 +58,23 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
 
     # Allows for generating.
-    'django_generate_secret_key'
+    'django_generate_secret_key',
+
+    # Wagtail.
+    'wagtail.contrib.forms',
+    'wagtail.contrib.redirects',
+    'wagtail.embeds',
+    'wagtail.sites',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail.core',
+
+    'modelcluster',
+    'taggit',
 ]
 
 # # If not production, add rest framework.
@@ -71,6 +89,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # Wagtail.
+    'wagtail.core.middleware.SiteMiddleware',
+    'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'dcc.urls'
@@ -88,6 +110,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.media',
             ],
         },
     },
@@ -168,3 +191,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
     '/var/www/static/',
 ]
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+MEDIA_URL = '/media/'

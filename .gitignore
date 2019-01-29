@@ -9,3 +9,7 @@ env-dcc
 
 # Ignore the secret key file.
 secretkey.txt
+
+# Contents of media folder.
+media/*
+!media

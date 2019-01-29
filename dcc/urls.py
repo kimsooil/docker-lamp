@@ -18,7 +18,11 @@ from rest_framework_swagger.views import get_swagger_view
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path, include
+
+from wagtail.admin import urls as wagtailadmin_urls
+from wagtail.documents import urls as wagtaildocs_urls
+from wagtail.core import urls as wagtail_urls
 
 from .views import HomeView, AboutView, HelpView
 from .views import ExampleAuthenticatedView, ExampleView
@@ -29,14 +33,17 @@ urlpatterns = [
     path('about/', AboutView.as_view(), name='about'),
     path('help/', HelpView.as_view(), name='help'),
 
+    # Wagtail.
+    re_path(r'^cms/', include(wagtailadmin_urls)),
+    re_path(r'^documents/', include(wagtaildocs_urls)),
+    re_path(r'^pages/', include(wagtail_urls)),
 
     # Example DRF views.
     path('drf/not-authenticated/', ExampleView.as_view()),
     path('drf/authenticated/', ExampleAuthenticatedView.as_view())
-]
-#  + static(
-#     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
-# )
+] + static(
+    settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+)
 
 # If debugging is on (i.e. not production), then include these urls.
 if settings.DEBUG:
