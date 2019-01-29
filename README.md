@@ -1,9 +1,27 @@
 # Stuff
 
 
+## General development
+
+Because the project uses docker to run, it may be necessary in some cases to have a virtual environment where the IDE can know about installed packages and such. To do this, you can do the following.
+
+NOTE: You can either build this inside the project or outside the project. .gitignore entry has been added for dcc.
+
+```sh
+# Create a virtual environment.
+virtualenv env-dcc -p python3
+
+# Activate the environment.
+source env-dcc/bin/activate
+
+# Install base requirements and developer requirements.
+pip install -r requirements/base.txt
+pip install -r requirements/development.txt
+```
+
 ## Basic interaction with the containers.
 
-### General contain
+### General containers
 
 docker exec container-name -it bash
 

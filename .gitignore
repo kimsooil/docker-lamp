@@ -1,3 +1,11 @@
+# Ignore the .env file that has the environment variables.
 .env
 
+# Not sure what these are. Ignore these.
 __pycache__
+
+# Ignore the virtual environment.
+env-dcc
+
+# Ignore the secret key file.
+secretkey.txt
