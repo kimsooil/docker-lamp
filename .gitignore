@@ -9,5 +9,3 @@ env-dcc
 
 # Ignore the secret key file.
 secretkey.txt
-
-secretkey_backup.txt
