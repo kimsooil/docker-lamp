@@ -29,7 +29,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Use a separate file for the secret key
 with open(os.path.join(BASE_DIR, 'secretkey.txt')) as f:
     SECRET_KEY = f.read().strip()
-    print ('SECRET_KEYSECRET_KEYSECRET_KEYSECRET_KEYSECRET_KEYSECRET_KEYSECRET_KEYSECRET_KEY', SECRET_KEY)
 
 # SECRET_KEY = ENV['SECRET_KEY']
 
@@ -77,9 +76,51 @@ INSTALLED_APPS = [
     'taggit',
 ]
 
+
+# # APPS
+# # ------------------------------------------------------------------------------
+# DJANGO_APPS = [
+#     'django.contrib.auth',
+#     'django.contrib.contenttypes',
+#     'django.contrib.sessions',
+#     'django.contrib.sites',
+#     'django.contrib.messages',
+#     'django.contrib.staticfiles',
+#     # 'django.contrib.humanize', # Handy template tags
+#     'django.contrib.admin',
+# ]
+# THIRD_PARTY_APPS = [
+#     'crispy_forms',
+#     'allauth',
+#     'allauth.account',
+#     'allauth.socialaccount',
+#     'rest_framework',
+# ]
+# LOCAL_APPS = [
+#     'django_cc.users.apps.UsersAppConfig',
+#     # Your stuff: custom apps go here
+# ]
+# # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
+# INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
 # # If not production, add rest framework.
 # if not ENV['ENVIRONMENT'] == 'production':
 #     INSTALLED_APPS.append('rest_framework_swagger')
+
+
+# # AUTHENTICATION
+# # ------------------------------------------------------------------------------
+# # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
+# AUTHENTICATION_BACKENDS = [
+#     'django.contrib.auth.backends.ModelBackend',
+#     'allauth.account.auth_backends.AuthenticationBackend',
+# ]
+# # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
+# AUTH_USER_MODEL = 'users.User'
+# # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
+# LOGIN_REDIRECT_URL = 'users:redirect'
+# # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
+# LOGIN_URL = 'account_login'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
