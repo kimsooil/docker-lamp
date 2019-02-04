@@ -5,3 +5,4 @@ Markdown
 psycopg2-binary
 django-generate-secret-key
 wagtail
+django-crispy-forms

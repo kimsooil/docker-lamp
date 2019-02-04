@@ -27,8 +27,13 @@ from wagtail.core import urls as wagtail_urls
 from .views import HomeView, AboutView, HelpView
 from .views import ExampleAuthenticatedView, ExampleView
 
+from users import urls as users_urls
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
+    path('users/', include(users_urls)),
+
     path('', HomeView.as_view(), name='home'),
     path('about/', AboutView.as_view(), name='about'),
     path('help/', HelpView.as_view(), name='help'),

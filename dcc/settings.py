@@ -40,23 +40,25 @@ ALLOWED_HOSTS = []
 # Wagtail.
 WAGTAIL_SITE_NAME = 'Django Cookie Cutter!'
 
-# Application definition
+# APPS
+# ------------------------------------------------------------------------------
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
 
-
-    # ---------------------------
+THIRD_PARTY_APPS = [
     # Django Rest Framework.
     'rest_framework',
-    'rest_framework_swagger',
+    # 'rest_framework_swagger',
+    'rest_framework.authtoken',
 
-    # Allows for generating.
+    # Allows for generating secret key.
     'django_generate_secret_key',
 
     # Wagtail.
@@ -74,52 +76,36 @@ INSTALLED_APPS = [
 
     'modelcluster',
     'taggit',
+
+    # For the users app.
+    'crispy_forms',
 ]
 
+# If not production, add rest framework.
+if not ENV['ENVIRONMENT'] == 'production':
+    THIRD_PARTY_APPS.append('rest_framework_swagger')
 
-# # APPS
-# # ------------------------------------------------------------------------------
-# DJANGO_APPS = [
-#     'django.contrib.auth',
-#     'django.contrib.contenttypes',
-#     'django.contrib.sessions',
-#     'django.contrib.sites',
-#     'django.contrib.messages',
-#     'django.contrib.staticfiles',
-#     # 'django.contrib.humanize', # Handy template tags
-#     'django.contrib.admin',
-# ]
-# THIRD_PARTY_APPS = [
-#     'crispy_forms',
-#     'allauth',
-#     'allauth.account',
-#     'allauth.socialaccount',
-#     'rest_framework',
-# ]
-# LOCAL_APPS = [
-#     'django_cc.users.apps.UsersAppConfig',
-#     # Your stuff: custom apps go here
-# ]
+LOCAL_APPS = [
+    'users.apps.UsersAppConfig',
+    # Your stuff: custom apps go here
+]
+
 # # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
-# INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
-
-# # If not production, add rest framework.
-# if not ENV['ENVIRONMENT'] == 'production':
-#     INSTALLED_APPS.append('rest_framework_swagger')
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 
-# # AUTHENTICATION
-# # ------------------------------------------------------------------------------
-# # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
-# AUTHENTICATION_BACKENDS = [
-#     'django.contrib.auth.backends.ModelBackend',
-#     'allauth.account.auth_backends.AuthenticationBackend',
-# ]
-# # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
-# AUTH_USER_MODEL = 'users.User'
-# # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
+# AUTHENTICATION
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
+AUTH_USER_MODEL = 'users.User'
+# https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
 # LOGIN_REDIRECT_URL = 'users:redirect'
-# # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
+# https://docs.djangoproject.com/en/dev/ref/settings/#login-url
 # LOGIN_URL = 'account_login'
 
 MIDDLEWARE = [
