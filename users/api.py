@@ -2,6 +2,8 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
+from rest_framework.views import APIView
+
 class CustomAuthToken(ObtainAuthToken):
     """
     - This is the login view to get a user token.
@@ -17,3 +19,18 @@ class CustomAuthToken(ObtainAuthToken):
             'user_id': user.pk,
             'email': user.email
         })
+
+
+class LogoutEverywhereView(APIView):
+    throttle_classes = ()
+    permission_classes = ()
+    parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.JSONParser,)
+    renderer_classes = (renderers.JSONRenderer,)
+    serializer_class = AuthTokenSerializer
+
+    def post(self, request, *args, **kwargs):
+        token, created = Token.objects.get(user=self.request.user).delete()
+        return Response({'token': token.key})
+
+
+obtain_auth_token = ObtainAuthToken.as_view()

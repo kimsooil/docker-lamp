@@ -9,14 +9,15 @@ from .views import (
 
 from .api import CustomAuthToken
 
-from django.contrib.auth.views import LogoutView
+# from django.contrib.auth.views import LogoutView
+from .views import UserLogoutView
 
 app_name = "users"
 urlpatterns = [
     # path("", view=user_list_view, name="list"),
     path("api/authenticate/", view=CustomAuthToken.as_view(), name="api-authenticate"),
 
-    path("logout/", view=LogoutView.as_view(), name="logout"),
+    path("logout/", view=UserLogoutView.as_view(), name="logout"),
 
 
     path("~redirect/", view=user_redirect_view, name="redirect"),

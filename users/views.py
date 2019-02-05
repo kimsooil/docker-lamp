@@ -66,17 +66,19 @@ user_redirect_view = UserRedirectView.as_view()
 #         logout(self.request)
 #         return super().form_valid(form)
 
-# class UserLogoutView(LoginRequiredMixin, UpdateView):
+class UserLogoutView(LoginRequiredMixin, FormView):
 
-#     model = User
-#     fields = ["name"]
+    model = User
+    fields = ["name"]
+    template_name = 'user_logout.html'
 
-#     def get_success_url(self):
-#         return reverse("users:detail", kwargs={"username": self.request.user.username})
+    def get_success_url(self):
+        # return reverse("users:detail", kwargs={"username": self.request.user.username})
+        return reverse('home')
 
-#     def get_object(self):
-#         print(dir((self.request.user)))
-#         return User.objects.get(username=self.request.user.username)
+    def get_object(self):
+        print(dir((self.request.user)))
+        return User.objects.get(username=self.request.user.username)
 
 
-# user_update_view = UserUpdateView.as_view()
+user_update_view = UserUpdateView.as_view()
