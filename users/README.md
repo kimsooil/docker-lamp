@@ -15,3 +15,18 @@ In order to use DRF authentication, use the following path, passing in the *user
     "email": "email@example.com"
 }
 ```
+
+
+### Django Rest Framework (DRF) API Logout everywhere.
+
+Given a token, logout.
+
+**POST** */users/api/logout/*
+
+**Response**
+
+```json
+{
+    "response": "Ok"
+}
+```

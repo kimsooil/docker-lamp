@@ -82,3 +82,7 @@ This is a good summary of how wagtail is being used in the project [https://docs
 Wagtail is already installed. It can be disabled whenever needed.
 
 **NOTE:** Migrations will be run 
+
+## DRF
+
+Since the emphais will be on using DRF + Frontend JS Framework, *django-cors-headers* is needed. cors allows django to add CORS headers to responses. This allows the frontend application (VueJS, ReactJS, Angular, Mobile apps, etc.) to get/post data from the Django application. In the case of development, this is necessarity because, when creating a single page app, the development happens on a separae port, and, as such, the Django application needs to allow Cross-Origin.

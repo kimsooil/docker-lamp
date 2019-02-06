@@ -7,7 +7,7 @@ from .views import (
     user_detail_view,
 )
 
-from .api import CustomAuthToken
+from .api import LoginAPIView, UpdateMeAPIView, MeAPIView, LogoutAPIView
 
 # from django.contrib.auth.views import LogoutView
 from .views import UserLogoutView
@@ -15,7 +15,10 @@ from .views import UserLogoutView
 app_name = "users"
 urlpatterns = [
     # path("", view=user_list_view, name="list"),
-    path("api/authenticate/", view=CustomAuthToken.as_view(), name="api-authenticate"),
+    path("api/authenticate/", view=LoginAPIView.as_view(), name="api-login"),
+    path("api/me/", view=MeAPIView.as_view(), name="api-me"),
+    path("api/update/", view=UpdateMeAPIView.as_view(), name="api-update"),
+    path("api/logout/", view=LogoutAPIView.as_view(), name="api-logout-everywhere"),
 
     path("logout/", view=UserLogoutView.as_view(), name="logout"),
 
