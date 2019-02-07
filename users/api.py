@@ -11,19 +11,9 @@ from rest_framework import parsers
 from rest_framework import renderers
 from rest_framework import status
 
-from rest_framework import serializers
+from users.serializers.user_serializers import UserSerializer
 
 User = get_user_model()
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = [
-            'name',
-            'email',
-            'username',
-        ]
-        read_only_fields = ['email']
 
 class LoginAPIView(ObtainAuthToken):
     """
@@ -44,7 +34,7 @@ class LoginAPIView(ObtainAuthToken):
 
 class MeAPIView(APIView):
     """
-    - 
+    - Return user's account info.
     """
     throttle_classes = ()
     permission_classes = ()
@@ -61,7 +51,7 @@ class MeAPIView(APIView):
 
 class UpdateMeAPIView(APIView):
     """
-    - 
+    - Allows user to update their name/username.
     """
     throttle_classes = ()
     permission_classes = ()
@@ -94,7 +84,8 @@ class UpdateMeAPIView(APIView):
 
 class LogoutAPIView(APIView):
     """
-    - 
+    - Logs out the user.
+    NOTE: This will delete the token, thereby logging them out from everywhere.
     """
     throttle_classes = ()
     permission_classes = ()
