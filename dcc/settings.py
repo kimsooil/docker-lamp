@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-from os import environ as ENV
+# from os import environ as ENV
+import environ
+ENV = environ.Env()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 # Use this one if dcc/development.py
@@ -33,9 +35,9 @@ with open(os.path.join(BASE_DIR, 'secretkey.txt')) as f:
 # SECRET_KEY = ENV['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False if ENV['ENVIRONMENT'] == 'production' else True
+DEBUG = False if ENV('ENVIRONMENT') == 'production' else True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ENV.list('DJANGO_ALLOWED_HOSTS', default=['localhost','127.0.0.1'])
 
 # Wagtail.
 WAGTAIL_SITE_NAME = 'Django Cookie Cutter!'
@@ -85,7 +87,7 @@ THIRD_PARTY_APPS = [
 ]
 
 # If not production, add rest framework.
-if not ENV['ENVIRONMENT'] == 'production':
+if not ENV('ENVIRONMENT') == 'production':
     THIRD_PARTY_APPS.append('rest_framework_swagger')
 
 LOCAL_APPS = [
@@ -169,13 +171,14 @@ WSGI_APPLICATION = 'dcc.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': ENV['POSTGRES_DB'],
-        'USER': ENV['POSTGRES_USER'],
-        'PASSWORD': ENV['POSTGRES_PASSWORD'],
+        'NAME': ENV('POSTGRES_DB'),
+        'USER': ENV('POSTGRES_USER'),
+        'PASSWORD': ENV('POSTGRES_PASSWORD'),
         'HOST': 'postgresdb',
         'PORT': '5432',
     }
 }
+DATABASES['default']['ATOMIC_REQUESTS'] = True
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -204,8 +207,15 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
-    )
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 50,
 }
+
+# Email settings.
+EMAIL_BACKEND = ENV('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = ENV('DJANGO_EMAIL_HOST', default='localhost')
+EMAIL_PORT = ENV('DJANGO_EMAIL_PORT', default='25')
 
 
 # Internationalization
@@ -213,7 +223,8 @@ REST_FRAMEWORK = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# Get the timezone from the system.
+TIME_ZONE = os.getenv('TIME_ZONE', "America/Indianapolis")
 
 USE_I18N = True
 

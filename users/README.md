@@ -4,7 +4,7 @@
 
 In order to use DRF authentication, use the following path, passing in the *username/password*.
 
-**POST** */users/api/authenticate/*
+**POST** */users/api/login/*
 
 **Response**
 
@@ -30,3 +30,8 @@ Given a token, logout.
     "response": "Ok"
 }
 ```
+
+
+### Other
+
+For the rest, visit */swagger* for more information.

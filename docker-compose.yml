@@ -6,6 +6,12 @@ volumes:
     pgdata:
     
 services:
+    mailhog:
+        image: mailhog/mailhog
+        restart: unless-stopped
+        ports:
+            - "127.0.0.1:8025:8025"
+
     postgresdb:
         image: postgres:9.6-alpine
         environment:
@@ -38,6 +44,7 @@ services:
             - 127.0.0.1:8000:8000
         depends_on:
             - postgresdb
+            - mailhog
         environment: # NOTE: Without
             - POSTGRES_DB
             - POSTGRES_USER
@@ -45,5 +52,9 @@ services:
             - DJANGO_SETTINGS_MODULE
             - ENVIRONMENT
             - SECRET_KEY
+            - DJANGO_ALLOWED_HOSTS
+            - DJANGO_EMAIL_HOST="mailhog"
+            - DJANGO_EMAIL_PORT=1025
+            - DJANGO_EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
         links:
             - "postgresdb"

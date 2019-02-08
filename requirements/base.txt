@@ -7,3 +7,4 @@ django-generate-secret-key
 wagtail
 django-crispy-forms
 django-cors-headers
+django-environ

@@ -18,7 +18,7 @@ User = get_user_model()
 class LoginAPIView(ObtainAuthToken):
     """
     - Inherits from ObtainAuthToken.
-    - Logs in the user by checking their username/
+    Logs in the user by checking their username/
     """
 
     def post(self, request, *args, **kwargs):
