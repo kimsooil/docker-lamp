@@ -49,12 +49,14 @@ services:
             - POSTGRES_DB
             - POSTGRES_USER
             - POSTGRES_PASSWORD
+            - POSTGRES_HOST=postgresdb # Name of the postgresql service.
+            - POSTGRES_PORT
             - DJANGO_SETTINGS_MODULE
             - ENVIRONMENT
             - SECRET_KEY
             - DJANGO_ALLOWED_HOSTS
-            - DJANGO_EMAIL_HOST="mailhog"
+            - DJANGO_EMAIL_HOST=mailhog
             - DJANGO_EMAIL_PORT=1025
-            - DJANGO_EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend"
+            - DJANGO_EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
         links:
             - "postgresdb"

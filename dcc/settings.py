@@ -174,8 +174,8 @@ DATABASES = {
         'NAME': ENV('POSTGRES_DB'),
         'USER': ENV('POSTGRES_USER'),
         'PASSWORD': ENV('POSTGRES_PASSWORD'),
-        'HOST': 'postgresdb',
-        'PORT': '5432',
+        'HOST': ENV('POSTGRES_HOST', default='localhost'),
+        'PORT': ENV('POSTGRES_PORT', default='5432'),
     }
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
@@ -216,7 +216,6 @@ REST_FRAMEWORK = {
 EMAIL_BACKEND = ENV('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
 EMAIL_HOST = ENV('DJANGO_EMAIL_HOST', default='localhost')
 EMAIL_PORT = ENV('DJANGO_EMAIL_PORT', default='25')
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
