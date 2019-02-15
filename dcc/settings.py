@@ -84,6 +84,9 @@ THIRD_PARTY_APPS = [
 
     # CORS.
     'corsheaders',
+
+    # Django OAuth Toolkit
+    'oauth2_provider',
 ]
 
 # If not production, add rest framework.
@@ -201,9 +204,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # Django rest framework authentication scheme.
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     ),
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',

@@ -15,6 +15,10 @@ from users.serializers.user_serializers import UserSerializer
 
 User = get_user_model()
 
+# from oua
+# class TestDOAuth2():
+
+
 class LoginAPIView(ObtainAuthToken):
     """
     - Inherits from ObtainAuthToken.

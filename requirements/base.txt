@@ -8,3 +8,4 @@ wagtail
 django-crispy-forms
 django-cors-headers
 django-environ
+django-oauth-toolkit
