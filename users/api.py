@@ -15,8 +15,11 @@ from users.serializers.user_serializers import UserSerializer
 
 User = get_user_model()
 
-# from oua
-# class TestDOAuth2():
+from oauth2_provider.views.generic import ProtectedResourceView
+
+# class TestDOAuth2(ProtectedResourceView):
+#     def get(self, request, *args, **kwargs):
+#         return Response({'test': "Hi there!"})
 
 
 class LoginAPIView(ObtainAuthToken):
@@ -36,13 +39,13 @@ class LoginAPIView(ObtainAuthToken):
             'email': user.email
         })
 
-class MeAPIView(APIView):
+class MeAPIView(ProtectedResourceView, APIView):
     """
     - Return user's account info.
     """
     throttle_classes = ()
     permission_classes = ()
-    authentication_classes = (SessionAuthentication, TokenAuthentication,)
+    # authentication_classes = (SessionAuthentication, TokenAuthentication,)
 
     parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.JSONParser,)
     renderer_classes = (renderers.JSONRenderer,)
