@@ -9,7 +9,7 @@ Documentation loosely based on https://django-oauth-toolkit.readthedocs.io/en/la
 
 ### Creating an app
 
-Being logged in as an admin, got to */o/applications/* and create an application.
+Login to the admin portal to create an application. */admin/oauth2_provider/application/*
 
 #### Form data
 
@@ -28,8 +28,11 @@ Once the app is setup, you can use *simple* token fetching to get a token for a 
 
 ##### Request
 
-POST: */o/token/*
+###### Method
 
+POST: */users/api/token/*
+
+###### POST data
 ```
 {
     'grant_type': 'password',
@@ -60,6 +63,8 @@ Now that you have a token, it is time to use it.
 
 ##### Request 
 
+###### Method
+
 GET: */users/api/me/*
 
 ###### Headers
@@ -78,6 +83,40 @@ Authorization: Bearer SuEUwISaQwRWCzdT3Gw9BQ2TrB8P7C
 }
 ```
 
+### Revoke a token (i.e. logout)
+
+Revoke a token (the equivalence of 'logging out'). **NOTE: This only logs out one token at a time.**
+
+#### Example using postman
+
+##### Request 
+
+GET: */users/api/revoke-token/*
+
+###### Headers
+
+```
+Authorization: Bearer SuEUwISaQwRWCzdT3Gw9BQ2TrB8P7C
+```
+
+###### Body
+
+```
+{
+    'token': 'SuEUwISaQwRWCzdT3Gw9BQ2TrB8P7C',
+    'client_id': '<Your application client id>',
+    'client_secret': '<Your application client secret>'
+}
+```
+
+##### Response
+
+Blank response with a 200 status.
+
+```
+
+```
+
 ### Security notes
 
-For the most part, the */o/applications/* part seems to be 
+Only the relevant paths have been exposed. ALL others have been left out for security purposes.

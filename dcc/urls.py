@@ -34,7 +34,7 @@ urlpatterns = [
     
     path('users/', include(users_urls)),
 
-    re_path(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    # re_path(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 
     path('', HomeView.as_view(), name='home'),
     path('about/', AboutView.as_view(), name='about'),

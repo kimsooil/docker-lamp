@@ -12,9 +12,17 @@ from .api import LoginAPIView, UpdateMeAPIView, MeAPIView, LogoutAPIView
 # from django.contrib.auth.views import LogoutView
 from .views import UserLogoutView
 
+# OAuth2 provider views.
+import oauth2_provider.views as oauth2_views
+
 app_name = "users"
 urlpatterns = [
     # path("", view=user_list_view, name="list"),
+
+    # Authentication/Authorization/Revoke paths.
+    # path('api/authorize/', oauth2_views.AuthorizationView.as_view(), name="authorize"),
+    path('api/token/', oauth2_views.TokenView.as_view(), name="token"),
+    path('api/revoke-token/', oauth2_views.RevokeTokenView.as_view(), name="revoke-token"),
 
     # Login/LOgout paths.
     path("api/login/", view=LoginAPIView.as_view(), name="api-login"),
