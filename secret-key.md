@@ -2,19 +2,12 @@
 
 ## How to.
 
-The *SECRET_KEY* is generated and stored in a file using the 'django-generate-secret-key' module. The command is as follows:
+The *SECRET_KEY* is automatically generated when container is first initialized. If a 'secretkey.txt' file does not exist, one is created with a new *SECRET_KEY* value.
 
-### Without docker
-```bash
-python3 manage.py generate_secret_key --replace
-```
+### Replacing the *SECRET_KEY*
 
-### Using docker:
+Replacing the *SECRET_KEY* requires a django restart. In order to do this (i.e. replace the key), delete the *secretkey.txt* file and run 
 
 ```bash
-docker exec container_name python3 manage.py generate_secret_key --replace
+docker-compose up --rebuild
 ```
-
-The command stores the key in a file called *secretkey.txt*. The key is then read into the *settings.py* file on runtime. 
-
-**NOTE**: To replace the key, use the *--replace* flag.

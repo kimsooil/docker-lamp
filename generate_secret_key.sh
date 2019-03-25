@@ -1,2 +1,3 @@
-echo "This will change." >> secretkey.txt
-python3 manage.py generate_secret_key --replace
+if [ ! -f ./secretkey.txt ]; then
+    python3 ./generate_secret_key.py >> secretkey.txt
+fi
