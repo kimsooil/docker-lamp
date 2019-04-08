@@ -58,7 +58,9 @@ services:
             - DJANGO_EMAIL_HOST=mailhog
             - DJANGO_EMAIL_PORT=1025
             - DJANGO_EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+            - ADMIN_USERNAME
             - ADMIN_EMAIL
             - ADMIN_PASSWORD
+            - ADMIN_RESET
         links:
             - "postgresdb"

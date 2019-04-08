@@ -60,8 +60,8 @@ THIRD_PARTY_APPS = [
     # 'rest_framework_swagger',
     'rest_framework.authtoken',
 
-    # Allows for generating secret key.
-    'django_generate_secret_key',
+    # # Allows for generating secret key.
+    # 'django_generate_secret_key',
 
     # Wagtail.
     'wagtail.contrib.forms',

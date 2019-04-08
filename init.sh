@@ -7,6 +7,9 @@ bash wait_for_postgres.sh
 
 bash generate_secret_key.sh
 
+# Run migrations.
+python manage.py migrate
+
 # Create the admin user.
 python create_admin.py
 
