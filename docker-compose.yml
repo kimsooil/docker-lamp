@@ -11,6 +11,8 @@ services:
         restart: unless-stopped
         ports:
             - "127.0.0.1:8025:8025"
+        networks:
+            - frontend
 
     postgresdb:
         image: postgres:9.6-alpine
@@ -23,6 +25,8 @@ services:
             - pgdata:/var/lib/postgresql/data
         ports:
             - "127.0.0.1:5432:5432"
+        networks:
+            - backend
         # # build: ./docker_postgres
         # # image: postgresql_database:latest
         # image: postgres:9.6-alpine
@@ -38,6 +42,9 @@ services:
     web:
         build: .
         image: django_web:latest
+        networks:
+            - backend
+            - frontend
         volumes:
             - .:/app/
         ports: # IMPORTANT: Make sure to use 127.0.0.1 to keep it local. Otherwise, this will be broadcast to the web.
@@ -64,3 +71,7 @@ services:
             - ADMIN_RESET
         links:
             - "postgresdb"
+
+networks:
+    frontend:
+    backend:
