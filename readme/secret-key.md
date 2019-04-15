@@ -6,7 +6,7 @@ The *SECRET_KEY* is automatically generated when container is first initialized.
 
 ### Replacing the *SECRET_KEY*
 
-Replacing the *SECRET_KEY* requires a django restart. In order to do this (i.e. replace the key), delete the *secretkey.txt* file and run 
+Because replacing the *SECRET_KEY* requires a django restart anyway, it is recommended that you simply *delete* the 'secretkey.txt' file and restart your docker-compose instance.
 
 ```bash
 docker-compose up
