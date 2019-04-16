@@ -13,3 +13,6 @@ secretkey.txt
 # Contents of media folder.
 media/*
 !media
+
+# database file
+db.sqlite3*
