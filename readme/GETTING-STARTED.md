@@ -10,6 +10,7 @@ Keys | Description
 DCC | Django Cookie Cutter
 CC | Cookie Cutter
 
+NOTE: The main 'readme.md' on the root directory is left blank for a reason. It is to be used solely for project specific documentation.
 
 Files | Description
 ----- | -----------
