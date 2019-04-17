@@ -17,6 +17,7 @@ ADD . /app/
 # Install requirements for Django
 RUN pip install -r requirements/base.txt
 RUN pip install -r requirements/development.txt
+RUN pip install -r requirements/custom.txt
 
 # Expose the port so we can access Django as it's running
 EXPOSE 8000
