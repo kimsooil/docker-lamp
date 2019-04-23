@@ -7,7 +7,6 @@
 
 Keys | Description
 ----- | -----------
-CRC-DCC | CRC Django Cookie Cutter
 DCC | Django Cookie Cutter
 CC | Cookie Cutter
 
@@ -34,61 +33,7 @@ Fork the project using the GitHub 'Fork' button on the top right of the repo pag
 git clone https://github.com/bringthehouse/crc-dcc.git
 ```
 
-### Upstream.
-
-Add the base git repo as an upstream.
-
-```sh
-git remote add upstream https://github.com/crcresearch/crc-dcc.git
-```
-
-#### remotes
-
-```sh
-git remove -v
-```
-
-##### result
-
-```sh
-origin	https://github.com/bringthehouse/crc-dcc.git (fetch)
-origin	https://github.com/bringthehouse/crc-dcc.git (push)
-upstream	https://github.com/crcresearch/crc-dcc.git (fetch)
-upstream	https://github.com/crcresearch/crc-dcc.git (push)
-```
-
-*NOTE: upstream is the 'base' CRC-DCC repo*
-
-### Updating from upstream.
-
-Let's say that the base CRC-DCC is updated. How do you get the changes to your fork? 
-
-
-#### Get the updates from upstream.
-
-```sh
-git fetch upstream
-```
-
-#### Select branch to update.
-
-It is recommended that you update your develop branch (or a test branch) instead of master. We will try to not have breaking changes, but, this will allow you to test your repo in case there are any issues before adding this
-```sh
-git checkout develop
-```
-
-#### Rebase
-
-Running this command will reabase your selected branch with the upstream's (base CRC-DCC) master branch. 
-
-```sh
-git rebase upstream/master
-```
-
-#### Update your repo.
-```sh
-git push -f origin develop
-```
+### Add the original repo as a 
 
 ## General development
 
