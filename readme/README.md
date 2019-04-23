@@ -10,7 +10,7 @@ Keys | Description
 DCC | Django Cookie Cutter
 CC | Cookie Cutter
 
-NOTE: The main 'readme.md' on the root directory is left blank for a reason. It is to be used solely for project specific documentation.
+NOTE: The main 'readme.md' on the root directory is left blank for a reason. It is to be used solely as a starting point for project specific documentation.
 
 Files | Description
 ----- | -----------
@@ -20,6 +20,13 @@ GETTING-STARTED.md | This file. Entry point for CC documentation.
 SCRIPTS.md | Describes all the scripts used in the DCC.
 secret-key.md | Describes how the secret key used in Django is generated and re-generated.
 tests.md | Describes how to setup and run tests.
+
+## Creating a new project.
+
+### Fork this project
+
+```sh
+```
 
 ## General development
 
