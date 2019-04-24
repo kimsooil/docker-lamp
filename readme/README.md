@@ -92,13 +92,15 @@ git push -f origin develop
 
 #### Setup .env file
 
-```
-cat sample.env >> .env
+A *sample.env* file is provided with minimum required environment variables. Copy them to *.env* file and modify it as you wish.
+
+```sh
+cat sample.env > .env
 ```
 
 #### Start your project.
 
-```
+```sh
 docker-compose up --build
 ```
 
