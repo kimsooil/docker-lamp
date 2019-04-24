@@ -24,17 +24,17 @@ tests.md | Describes how to setup and run tests.
 
 ## Creating a new project.
 
-### Fork this project
+#### Fork this project
 
 Fork the project using the GitHub 'Fork' button on the top right of the repo page. https://github.com/crcresearch/crc-dcc. If necessary, rename your project appropriately.
 
-### Clone your new project.
+#### Clone your new project.
 
 ```sh
 git clone https://github.com/bringthehouse/crc-dcc.git
 ```
 
-### Upstream.
+#### Upstream.
 
 Add the base git repo as an upstream.
 
@@ -88,6 +88,18 @@ git rebase upstream/master
 #### Update your repo.
 ```sh
 git push -f origin develop
+```
+
+#### Setup .env file
+
+```
+cat sample.env >> .env
+```
+
+#### Start your project.
+
+```
+docker-compose up --build
 ```
 
 ## General development
