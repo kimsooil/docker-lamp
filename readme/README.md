@@ -26,12 +26,32 @@ tests.md | Describes how to setup and run tests.
 
 #### Fork this project
 
-Fork the project using the GitHub 'Fork' button on the top right of the repo page. https://github.com/crcresearch/crc-dcc. If necessary, rename your project appropriately.
+At the moment, forking and renaming is not an option (i.e. only Bitbucket does this). Because of that, go to next instruction.
 
-#### Clone your new project.
+#### Clone the DCC.
+
+Clone the repository to your desired project name.
 
 ```sh
-git clone https://github.com/bringthehouse/crc-dcc.git
+git clone https://github.com/crcresearch/crc-dcc.git project-name-crc-dcc
+```
+
+#### New GitHub repo.
+
+Create a new, empty GitHub repo for your new project.
+
+#### Change the 'origin' url.
+
+This step allows you to switch the source of your repository to your new project repository.
+
+```sh
+git remote set-url origin https://github.com/crcresearch/project-name-crc-dcc.git
+```
+
+#### Push your new repo.
+
+```sh
+git push -u origin master
 ```
 
 #### Upstream.
@@ -45,7 +65,7 @@ git remote add upstream https://github.com/crcresearch/crc-dcc.git
 #### remotes
 
 ```sh
-git remove -v
+git remote -v
 ```
 
 ##### result
