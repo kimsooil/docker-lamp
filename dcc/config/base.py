@@ -89,6 +89,11 @@ THIRD_PARTY_APPS = [
     'oauth2_provider',
 ]
 
+OAUTH2_PROVIDER = {
+# other OAUTH2 settings
+'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore'
+}
+
 # If not production, add rest framework.
 if not ENV('ENVIRONMENT') == 'production':
     THIRD_PARTY_APPS.append('rest_framework_swagger')
@@ -135,6 +140,17 @@ MIDDLEWARE = [
     'wagtail.core.middleware.SiteMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
+
+# False by default, but, can be modified to True for mobile applications.
+CORS_ORIGIN_ALLOW_ALL = True
+
+# # Whitelist can be used for development purposes.
+# CORS_ORIGIN_WHITELIST = (
+#     'google.com',
+#     'hostname.example.com',
+#     'localhost:8000',
+#     '127.0.0.1:9000'
+# )
 
 ROOT_URLCONF = 'dcc.urls'
 
@@ -211,6 +227,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PARSER_CLASSES': (
         'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 50,

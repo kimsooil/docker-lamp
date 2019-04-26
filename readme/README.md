@@ -71,18 +71,23 @@ git remote -v
 ##### result
 
 ```sh
-origin	https://github.com/bringthehouse/crc-dcc.git (fetch)
-origin	https://github.com/bringthehouse/crc-dcc.git (push)
+origin	https://github.com/crcresearch/project-name-crc-dcc.git (fetch)
+origin	https://github.com/crcresearch/project-name-crc-dcc.git (push)
 upstream	https://github.com/crcresearch/crc-dcc.git (fetch)
 upstream	https://github.com/crcresearch/crc-dcc.git (push)
 ```
 
 *NOTE: upstream is the 'base' CRC-DCC repo*
 
+*NOTE: If you need to remove an **upstream** repo (i.e. you made a mistake), use the command below and start again from the **Upstream** section.*
+
+```sh
+git remote rm upstream
+```
+
 ### Updating from upstream.
 
 Let's say that the base CRC-DCC is updated. How do you get the changes to your fork? 
-
 
 #### Get the updates from upstream.
 
