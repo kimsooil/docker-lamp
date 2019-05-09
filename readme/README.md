@@ -1,7 +1,5 @@
 # Getting Started
 
-# Hi David!!!!!
-
 ## README
 
 - Use this readme as the entry point for learning about the project.
@@ -26,7 +24,7 @@ tests.md | Describes how to setup and run tests.
 
 ## Creating a new project.
 
-#### Fork this project
+#### Fork this project (NOT)
 
 At the moment, forking and renaming is not an option (i.e. only Bitbucket does this). Because of that, go to next instruction.
 
@@ -46,6 +44,8 @@ Create a new, empty GitHub repo for your new project.
 
 This step allows you to switch the source of your repository to your new project repository.
 
+**NOTE: origin will be your newly created repo**
+
 ```sh
 git remote set-url origin https://github.com/crcresearch/project-name-crc-dcc.git
 ```
@@ -59,6 +59,8 @@ git push -u origin master
 #### Upstream.
 
 Add the base git repo as an upstream.
+
+**NOTE: upstream will be the base DCC.**
 
 ```sh
 git remote add upstream https://github.com/crcresearch/crc-dcc.git
@@ -99,7 +101,8 @@ git fetch upstream
 
 #### Select branch to update.
 
-It is recommended that you update your develop branch (or a test branch) instead of master. We will try to not have breaking changes, but, this will allow you to test your repo in case there are any issues before adding this
+It is recommended that you update your develop branch (or a test branch) instead of master. We will try to not have breaking changes, but, this will allow you to test your repo in case there are any issues before adding this.
+
 ```sh
 git checkout develop
 ```
