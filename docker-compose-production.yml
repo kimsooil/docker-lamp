@@ -1,0 +1,92 @@
+# https://cookiecutter-django.readthedocs.io/en/latest/developing-locally-docker.html#
+
+version: '3'
+
+volumes:
+    volume_postgresdata:
+    volume_django_media:
+    volume_django_static:
+    
+services:
+    mailhog:
+        image: mailhog/mailhog
+        restart: unless-stopped
+        ports:
+            - "127.0.0.1:8025:8025"
+        networks:
+            - frontend
+
+    postgresdb:
+        image: postgres:9.6-alpine
+        environment:
+            - POSTGRES_DB
+            - POSTGRES_USER
+            - POSTGRES_PASSWORD
+        restart: unless-stopped
+        volumes:
+            - volume_postgresdata:/var/lib/postgresql/data
+        ports:
+            - "127.0.0.1:5432:5432"
+        networks:
+            - backend
+    djangoweb:
+        build: .
+        # build:
+        #     context: ./dir
+        #     dockerfile: Dockerfile-something
+        image: djangoweb:latest
+        networks:
+            - backend
+            - frontend
+        volumes:
+            - .:/app/
+        ports: # IMPORTANT: Make sure to use 127.0.0.1 to keep it local. Otherwise, this will be broadcast to the web.
+            - 127.0.0.1:8000:8000
+        depends_on:
+            - postgresdb
+            - mailhog
+        environment: # NOTE: Without
+            - POSTGRES_DB
+            - POSTGRES_USER
+            - POSTGRES_PASSWORD
+            - POSTGRES_HOST=postgresdb # Name of the postgresql service.
+            - POSTGRES_PORT
+            - DJANGO_SETTINGS_MODULE
+            - ENVIRONMENT
+            - SECRET_KEY
+            - DJANGO_ALLOWED_HOSTS
+            - DJANGO_EMAIL_HOST=mailhog
+            - DJANGO_EMAIL_PORT=1025
+            - DJANGO_EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+            - ADMIN_USERNAME
+            - ADMIN_EMAIL
+            - ADMIN_PASSWORD
+            - ADMIN_RESET
+        links:
+            - "postgresdb"
+    
+    # NGINX Reverse Proxy
+    # Routes requests that require processing to Django
+    # and directly serves static files.
+    nginx:
+        restart: always
+        depends_on:
+            - djangoweb
+        image: nginx:1.15
+        networks:
+            - frontend
+        ports:
+            # Map standard HTTP/HTTPS ports from the host
+            # to the NGINX container.
+            - 80:80
+            - 443:443
+        volumes:
+            - ./config/ssl:/etc/ssl
+            - ./config/nginx/conf.d/${ENVIRONMENT}_local.conf:/etc/nginx/conf.d/local.conf
+            - ./config/nginx/snippets:/etc/nginx/snippets
+            - wellbeing_static_volume:/var/staticfiles
+            - wellbeing_media_volume:/var/mediafiles
+
+networks:
+    frontend:
+    backend:
