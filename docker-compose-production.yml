@@ -2,10 +2,11 @@
 
 version: '3'
 
+# 3 name volumes are named here.
 volumes:
-    volume_postgresdata:
-    volume_django_media:
-    volume_django_static:
+    volume_postgresdata:        # Store the postgres database data. Only linked with postgres.
+    volume_django_media:        # Store the Django media files. Volume is shared between djangoweb and nginx.
+    volume_django_static:       # Store the Django static files. Volume is shared between djangoweb and nginx.
     
 services:
     mailhog:
@@ -30,16 +31,18 @@ services:
         networks:
             - backend
     djangoweb:
-        build: .
-        # build:
-        #     context: ./dir
-        #     dockerfile: Dockerfile-something
+        # build: .
+        build:
+            context: ./dir
+            dockerfile: Dockerfile-django
         image: djangoweb:latest
         networks:
             - backend
             - frontend
         volumes:
             - .:/app/
+            - volume_django_static:/var/staticfiles
+            - volume_django_media:/var/mediafiles
         ports: # IMPORTANT: Make sure to use 127.0.0.1 to keep it local. Otherwise, this will be broadcast to the web.
             - 127.0.0.1:8000:8000
         depends_on:
@@ -81,11 +84,10 @@ services:
             - 80:80
             - 443:443
         volumes:
-            - ./config/ssl:/etc/ssl
-            - ./config/nginx/conf.d/${ENVIRONMENT}_local.conf:/etc/nginx/conf.d/local.conf
-            - ./config/nginx/snippets:/etc/nginx/snippets
-            - wellbeing_static_volume:/var/staticfiles
-            - wellbeing_media_volume:/var/mediafiles
+            - /opt/ssl:/etc/ssl
+            - ./config/nginx/dcc.conf:/etc/nginx/conf.d/dcc.conf
+            - volume_django_static:/var/staticfiles
+            - volume_django_media:/var/mediafiles
 
 networks:
     frontend:
