@@ -25,3 +25,13 @@ ADMIN_USERNAME | Username to use for the admin. | admin
 ADMIN_EMAIL | Email to use for the admin (NOTE: If email exists) | admin@example.com
 ADMIN_PASSWORD | Password to use for the admin account. | Make a strong password here!?
 ADMIN_RESET | If you want to reset the admin user. If accout doesn't exist, one is created. Otherwise, if exists, password is set to the one provided above.  | True/False
+WEB_SERVER_NAME | Stores the webserver name | site.crc.nd.edu
+
+## Further descriptions
+
+### WEB_SERVER_NAME
+
+The *WEB_SERVER_NAME* varaible is further used for certificates. In other words, if you have a *server_name* site.crc.nd.edu, then, the following certificate names are expected.
+
+- site_crc_nd_edu.key
+- site_crc_nd_edu_cert.cer

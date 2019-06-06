@@ -33,8 +33,12 @@ services:
     djangoweb:
         # build: .
         build:
-            context: ./dir
-            dockerfile: Dockerfile-django
+            context: .
+            dockerfile: docker/django.Dockerfile
+            args:
+                - WEB_SERVER_NAME
+                - BUILD_ENVIRONMENT=${ENVIRONMENT:-production}
+
         image: djangoweb:latest
         networks:
             - backend
@@ -65,6 +69,9 @@ services:
             - ADMIN_EMAIL
             - ADMIN_PASSWORD
             - ADMIN_RESET
+        args:
+            - WEB_SERVER_NAME
+            - BUILD_ENVIRONMENT=${ENVIRONMENT:-production}
         links:
             - "postgresdb"
     
@@ -72,10 +79,14 @@ services:
     # Routes requests that require processing to Django
     # and directly serves static files.
     nginx:
+        image: nginx:1.15
+        # build:
+        #     args:
+        #         - WEB_SERVER_NAME
+        #         - BUILD_ENVIRONMENT=${ENVIRONMENT:-production}
         restart: always
         depends_on:
             - djangoweb
-        image: nginx:1.15
         networks:
             - frontend
         ports:
@@ -88,6 +99,8 @@ services:
             - ./config/nginx/dcc.conf:/etc/nginx/conf.d/dcc.conf
             - volume_django_static:/var/staticfiles
             - volume_django_media:/var/mediafiles
+        environment: # NOTE: Without
+            - WEB_SERVER_NAME
 
 networks:
     frontend:
