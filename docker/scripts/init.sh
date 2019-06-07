@@ -25,7 +25,8 @@ if [ "$ENVIRONMENT" = "development" ]
 then
 python manage.py runserver 0.0.0.0:8000
 else
-gunicorn wsgi:application --bind 0.0.0.0:8000
+# gunicorn wsgi:application --bind 0.0.0.0:8000
+gunicorn dcc.wsgi --bind 0.0.0.0:8000
 fi
 
 # # Execute anything in the "CMD" definition

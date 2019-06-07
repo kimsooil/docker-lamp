@@ -72,6 +72,33 @@ services:
         links:
             - "postgresdb"
 
+    # NGINX Reverse Proxy
+    # Routes requests that require processing to Django
+    # and directly serves static files.
+    nginx:
+        image: nginx:1.15
+        # build:
+        #     args:
+        #         - WEB_SERVER_NAME
+        #         - BUILD_ENVIRONMENT=${ENVIRONMENT:-production}
+        restart: always
+        depends_on:
+            - djangoweb
+        networks:
+            - frontend
+        ports:
+            # Map standard HTTP/HTTPS ports from the host
+            # to the NGINX container.
+            - 80:80
+            - 443:443
+        volumes:
+            - /opt/ssl:/etc/ssl
+            - ./config/nginx/dcc.conf:/etc/nginx/conf.d/dcc.conf
+            - volume_django_static:/var/staticfiles
+            - volume_django_media:/var/mediafiles
+        environment:
+            - WEB_SERVER_NAME
+
 networks:
     frontend:
     backend:
