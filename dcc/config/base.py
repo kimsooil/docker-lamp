@@ -261,8 +261,9 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static/"),
-    '/var/www/static/',
+    '/var/staticfiles/',
 ]
+STATIC_ROOT = '/var/staticfiles/'
 
-MEDIA_ROOT = '/media/' if ENV('ENVIRONMENT') == 'production' else os.path.join(BASE_DIR, 'media/')
+MEDIA_ROOT = '/var/mediafiles/' if ENV('ENVIRONMENT') == 'production' else os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'

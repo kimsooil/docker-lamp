@@ -5,8 +5,8 @@ version: '3'
 # 3 name volumes are named here.
 volumes:
     volume_postgresdata:        # Store the postgres database data. Only linked with postgres.
-    volume_django_media:        # Store the Django media files. Volume is shared between djangoweb and nginx.
-    volume_django_static:       # Store the Django static files. Volume is shared between djangoweb and nginx.
+    volume_django_media:        # Store the Django media files. Volume is shared between djangoapp and nginx.
+    volume_django_static:       # Store the Django static files. Volume is shared between djangoapp and nginx.
     
 services:
     mailhog:
@@ -30,7 +30,7 @@ services:
             - "127.0.0.1:5432:5432"
         networks:
             - backend
-    djangoweb:
+    djangoapp:
         # build: .
         build:
             context: .
@@ -39,7 +39,7 @@ services:
                 - WEB_SERVER_NAME
                 - BUILD_ENVIRONMENT=${ENVIRONMENT:-production}
 
-        image: djangoweb:latest
+        image: djangoapp:latest
         networks:
             - backend
             - frontend
@@ -83,7 +83,7 @@ services:
         #         - BUILD_ENVIRONMENT=${ENVIRONMENT:-production}
         restart: always
         depends_on:
-            - djangoweb
+            - djangoapp
         networks:
             - frontend
         ports:
@@ -92,7 +92,7 @@ services:
             - 80:80
             - 443:443
         volumes:
-            - /opt/ssl:/etc/ssl
+            - ~/certs:/etc/ssl
             - ./config/nginx/dcc.conf:/etc/nginx/conf.d/dcc.conf
             - volume_django_static:/var/staticfiles
             - volume_django_media:/var/mediafiles
