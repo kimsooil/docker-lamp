@@ -29,7 +29,7 @@ steps:
       repo: zazu.crc.nd.edu/cookiecutters/django-cc
       registry: zazu.crc.nd.edu
       build_args:
-      - ENVIRONMENT=production
+        - ENVIRONMENT=production
       tags:
         - latest
         - '1.0'
