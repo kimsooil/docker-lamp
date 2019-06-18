@@ -28,6 +28,8 @@ steps:
         from_secret: DOCKER_REGISTRY_PASSWORD
       repo: zazu.crc.nd.edu/cookiecutters/django-cc
       registry: zazu.crc.nd.edu
+      build_args:
+      - ENVIRONMENT=production
       tags:
         - latest
         - '1.0'
