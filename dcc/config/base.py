@@ -39,7 +39,7 @@ DEBUG = False if ENV('ENVIRONMENT') == 'production' else True
 
 ALLOWED_HOSTS = ENV.list('DJANGO_ALLOWED_HOSTS', default=['localhost','127.0.0.1'])
 
-# Sets the 'prefix' of ALL django paths.
+# Sets the 'prefix' of ALL django paths. DO NOT INCLUDE THIS IN YOUR URLS.
 FORCE_SCRIPT_NAME = ENV('FORCE_SCRIPT_NAME', default=None)
 
 # Wagtail.
