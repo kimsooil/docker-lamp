@@ -39,6 +39,9 @@ DEBUG = False if ENV('ENVIRONMENT') == 'production' else True
 
 ALLOWED_HOSTS = ENV.list('DJANGO_ALLOWED_HOSTS', default=['localhost','127.0.0.1'])
 
+# Sets the 'prefix' of ALL django paths.
+FORCE_SCRIPT_NAME = ENV('FORCE_SCRIPT_NAME', default=None)
+
 # Wagtail.
 WAGTAIL_SITE_NAME = 'Django Cookie Cutter!'
 
