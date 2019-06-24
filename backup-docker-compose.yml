@@ -5,9 +5,9 @@ version: '3'
 # 3 name volumes are named here.
 volumes:
     volume_postgresdata:        # Store the postgres database data. Only linked with postgres.
-    volume_django_media:        # Store the Django media files. Volume is shared between djangoweb and nginx.
-    volume_django_static:       # Store the Django static files. Volume is shared between djangoweb and nginx.
-
+    volume_django_media:        # Store the Django media files. Volume is shared between djangoapp and nginx.
+    volume_django_static:       # Store the Django static files. Volume is shared between djangoapp and nginx.
+    
 services:
     mailhog:
         image: mailhog/mailhog
@@ -30,13 +30,21 @@ services:
             - "127.0.0.1:5432:5432"
         networks:
             - backend
+    djangoapp:
+        # build: .
+        build:
+            context: .
+            dockerfile: docker/django.Dockerfile
+            args:
+                - WEB_SERVER_NAME
+                - BUILD_ENVIRONMENT=${ENVIRONMENT:-production}
 
-    djangoweb:
-        image: zazu.crc.nd.edu/cookiecutters/django-cc
+        image: djangoapp:latest
         networks:
             - backend
             - frontend
         volumes:
+            - .:/app/
             - volume_django_static:/var/staticfiles
             - volume_django_media:/var/mediafiles
         ports: # IMPORTANT: Make sure to use 127.0.0.1 to keep it local. Otherwise, this will be broadcast to the web.
@@ -51,7 +59,6 @@ services:
             - POSTGRES_HOST=postgresdb # Name of the postgresql service.
             - POSTGRES_PORT
             - DJANGO_SETTINGS_MODULE
-            - FORCE_SCRIPT_NAME
             - ENVIRONMENT
             - SECRET_KEY
             - DJANGO_ALLOWED_HOSTS
@@ -70,9 +77,13 @@ services:
     # and directly serves static files.
     nginx:
         image: nginx:1.15
+        # build:
+        #     args:
+        #         - WEB_SERVER_NAME
+        #         - BUILD_ENVIRONMENT=${ENVIRONMENT:-production}
         restart: always
         depends_on:
-            - djangoweb
+            - djangoapp
         networks:
             - frontend
         ports:
@@ -81,13 +92,12 @@ services:
             - 80:80
             - 443:443
         volumes:
-            - ./certs:/etc/ssl
+            - ~/certs:/etc/ssl
             - ./config/nginx/dcc.conf:/etc/nginx/conf.d/dcc.conf
             - volume_django_static:/var/staticfiles
             - volume_django_media:/var/mediafiles
-        environment: # NOTE: Without
+        environment:
             - WEB_SERVER_NAME
-            - FORCE_SCRIPT_NAME
 
 networks:
     frontend:
