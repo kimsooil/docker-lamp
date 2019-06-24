@@ -103,6 +103,7 @@ if not ENV('ENVIRONMENT') == 'production':
 
 LOCAL_APPS = [
     'users.apps.UsersAppConfig',
+    'dcc'
     # Your stuff: custom apps go here
 ]
 
