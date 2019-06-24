@@ -262,10 +262,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static/"),
-    '/var/staticfiles/',
-]
+#STATICFILES_DIRS = [
+#    os.path.join(BASE_DIR, "static/"),
+#    '/var/staticfiles/',
+#]
 STATIC_ROOT = '/var/staticfiles/'
 
 MEDIA_ROOT = '/var/mediafiles/' if ENV('ENVIRONMENT') == 'production' else os.path.join(BASE_DIR, 'media/')
