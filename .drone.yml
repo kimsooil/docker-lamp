@@ -9,9 +9,10 @@ steps:
   - name: requirements
     image: python:3
     commands:
-      - pip install -r requirements/base.txt
-      - pip install -r requirements/production.txt
-      - pip install -r requirements/custom.txt
+      - mkdir python_modules
+      - pip install --target=$PWD/python_modules -r requirements/base.txt
+      - pip install --target=$PWD/python_modules -r requirements/production.txt
+      - pip install --target=$PWD/python_modules -r requirements/custom.txt
   # - name: flake8
   #   image: python:3
   #   commands:
@@ -22,6 +23,7 @@ steps:
   - name: showmigrations
     image: python:3
     commands:
+      - export PYTHONPATH=$PYTHONPATH:$PWD
       - python manage.py showmigrations
   - name: publish
     image: plugins/docker
