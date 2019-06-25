@@ -34,6 +34,8 @@ steps:
     image: python:3
     environment:
       POSTGRES_HOST: database
+    depends_on:
+      - requirements
     commands:
       - export PYTHONPATH=$PYTHONPATH:$PWD/python_modules
       - export $(grep -v '^#' .env | xargs -d '\n')
@@ -48,10 +50,15 @@ steps:
       - requirements
   - name: clean_up_python
     image: python:3
+    depends_on:
+      - flake8
+      - showmigrations
     commands:
       - rm -rf python_modules
   - name: publish
     image: plugins/docker
+    depends_on:
+      - clean_up_python
     settings:
       username:
         from_secret: DOCKER_REGISTRY_USERNAME
