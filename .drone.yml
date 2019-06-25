@@ -13,6 +13,7 @@ steps:
       - pip install --target=$PWD/python_modules -r requirements/base.txt
       - pip install --target=$PWD/python_modules -r requirements/production.txt
       - pip install --target=$PWD/python_modules -r requirements/custom.txt
+      - cp sample.env .env
   # - name: flake8
   #   image: python:3
   #   commands:
@@ -24,6 +25,7 @@ steps:
     image: python:3
     commands:
       - export PYTHONPATH=$PYTHONPATH:$PWD/python_modules
+      - export $(grep -v '^#' .env | xargs -d '\n')
       - python manage.py showmigrations
   - name: publish
     image: plugins/docker
