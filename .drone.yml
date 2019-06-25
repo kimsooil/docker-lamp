@@ -45,7 +45,7 @@ steps:
     image: python:3
     commands:
       - export PYTHONPATH=$PYTHONPATH:$PWD/python_modules
-      - pip install -r requirements/development.txt
+      - pip install --upgrade --force-reinstall -r requirements/development.txt
       - flake8 dcc --max-line-length=120
     depends_on:
       - requirements
