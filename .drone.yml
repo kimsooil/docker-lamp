@@ -44,7 +44,7 @@ steps:
     commands:
       - export PYTHONPATH=$PYTHONPATH:$PWD/python_modules
       - flake8 dcc --max-line-length=120
-    depends_on
+    depends_on:
       - requirements
   - name: clean_up_python
     image: python:3
