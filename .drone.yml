@@ -6,9 +6,30 @@ workspace:
   path: src/github.com/crcresearch/dcc
 
 steps:
-  - name: flake8
+  - name: requirements
     image: python:3
     commands:
-     - pip install -r requirements/base.txt
-     - pip install -r requirements/development.txt
-     - flake8 dcc --max-line-length=120 --exclude dcc/migrations
+      - pip install -r requirements/base.txt
+      - pip install -r requirements/production.txt
+      - pip install -r requirements/custom.txt
+  # - name: flake8
+  #   image: python:3
+  #   commands:
+  #    - pip install -r requirements/base.txt
+  #    - pip install -r requirements/production.txt
+  #    - pip install -r requirements/custom.txt
+  #   #  - flake8 dcc --max-line-length=120 --exclude dcc/migrations
+  - name: publish
+    image: plugins/docker
+    settings:
+      username:
+        from_secret: DOCKER_REGISTRY_USERNAME
+      password:
+        from_secret: DOCKER_REGISTRY_PASSWORD
+      repo: zazu.crc.nd.edu/cookiecutters/django-cc
+      registry: zazu.crc.nd.edu
+      build_args:
+        - ENVIRONMENT=production
+      tags:
+        - latest
+        - '1.0'
