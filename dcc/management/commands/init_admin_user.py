@@ -11,7 +11,7 @@ class Command(BaseCommand):
     help = 'Displays current time'
 
     def handle(self, *args, **kwargs):
-        email=env('ADMIN_EMAIL', default=None)
+        email = env('ADMIN_EMAIL', default=None)
 
         if email:
             if not User.objects.filter(email=email).exists():
