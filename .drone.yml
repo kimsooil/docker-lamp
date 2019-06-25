@@ -45,8 +45,7 @@ steps:
     image: python:3
     commands:
       - export PYTHONPATH=$PYTHONPATH:$PWD/python_modules
-      - pip install --upgrade --force-reinstall -r requirements/development.txt
-      - flake8 dcc --max-line-length=120
+      - python -m flake8 --select E --max-line-length=120 dcc 
     depends_on:
       - requirements
   - name: clean_up_python
