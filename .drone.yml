@@ -23,7 +23,7 @@ steps:
   - name: showmigrations
     image: python:3
     commands:
-      - export PYTHONPATH=$PYTHONPATH:$PWD
+      - export PYTHONPATH=$PYTHONPATH:$PWD/python_modules
       - python manage.py showmigrations
   - name: publish
     image: plugins/docker
