@@ -4,6 +4,14 @@ name: default
 workspace:
   base: /go
   path: src/github.com/crcresearch/dcc
+  
+services:
+- name: database
+  image: postgres
+  environment:
+    POSTGRES_DB: django
+    POSTGRES_USER: django
+    POSTGRES_PASSWORD: django
 
 steps:
   - name: requirements
@@ -23,9 +31,12 @@ steps:
   #   #  - flake8 dcc --max-line-length=120 --exclude dcc/migrations
   - name: showmigrations
     image: python:3
+    environment:
+      POSTGRES_HOST: database
     commands:
       - export PYTHONPATH=$PYTHONPATH:$PWD/python_modules
       - export $(grep -v '^#' .env | xargs -d '\n')
+      - bash docker/scripts/generate_secret_key.sh
       - python manage.py showmigrations
   - name: publish
     image: plugins/docker
