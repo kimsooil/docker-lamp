@@ -20,6 +20,7 @@ steps:
       - mkdir python_modules
       - pip install --target=$PWD/python_modules -r requirements/base.txt
       - pip install --target=$PWD/python_modules -r requirements/production.txt
+      - pip install --target=$PWD/python_modules -r requirements/development.txt
       - pip install --target=$PWD/python_modules -r requirements/custom.txt
       - cp sample.env .env
   # - name: flake8
@@ -38,6 +39,17 @@ steps:
       - export $(grep -v '^#' .env | xargs -d '\n')
       - bash docker/scripts/generate_secret_key.sh
       - python manage.py showmigrations
+  - name: flake8
+    image: python:3
+    commands:
+      - export PYTHONPATH=$PYTHONPATH:$PWD/python_modules
+      - flake8 dcc --max-line-length=120
+    depends_on
+      - requirements
+  - name: clean_up_python
+    image: python:3
+    commands:
+      - rm -rf python_modules
   - name: publish
     image: plugins/docker
     settings:
