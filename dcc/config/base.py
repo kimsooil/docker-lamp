@@ -37,7 +37,7 @@ with open(os.path.join(BASE_DIR, 'secretkey.txt')) as f:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if ENV('ENVIRONMENT') == 'production' else True
 
-ALLOWED_HOSTS = ENV.list('DJANGO_ALLOWED_HOSTS', default=['localhost','127.0.0.1'])
+ALLOWED_HOSTS = ENV.list('DJANGO_ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 # Sets the 'prefix' of ALL django paths. DO NOT INCLUDE THIS IN YOUR URLS.
 FORCE_SCRIPT_NAME = ENV('FORCE_SCRIPT_NAME', default=None)
@@ -93,9 +93,9 @@ THIRD_PARTY_APPS = [
 ]
 
 OAUTH2_PROVIDER = {
-# other OAUTH2 settings
-'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore'
-}
+    # other OAUTH2 settings
+    'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore'
+    }
 
 # If not production, add rest framework.
 if not ENV('ENVIRONMENT') == 'production':
@@ -263,10 +263,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-#STATICFILES_DIRS = [
+# STATICFILES_DIRS = [
 #    os.path.join(BASE_DIR, "static/"),
 #    '/var/staticfiles/',
-#]
+# ]
 STATIC_ROOT = '/var/staticfiles/'
 
 MEDIA_ROOT = '/var/mediafiles/' if ENV('ENVIRONMENT') == 'production' else os.path.join(BASE_DIR, 'media/')
