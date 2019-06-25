@@ -3,10 +3,10 @@ from django.test import TestCase, Client
 
 
 class BaseViewTestCase(TestCase):
-    
+
     def setUp(self):
         self.client = Client()
-        
+
     def test_that_200_is_thrown_for_home(self):
         response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 200)

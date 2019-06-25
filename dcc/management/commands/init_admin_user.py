@@ -1,9 +1,11 @@
-from django.core.management.base import BaseCommand, CommandError
-
 import environ
-env = environ.Env()
+
+from django.core.management.base import BaseCommand
 
 from users.models import User
+
+env = environ.Env()
+
 
 class Command(BaseCommand):
     help = 'Displays current time'
