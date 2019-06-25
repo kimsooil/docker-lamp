@@ -19,6 +19,10 @@ steps:
   #    - pip install -r requirements/production.txt
   #    - pip install -r requirements/custom.txt
   #   #  - flake8 dcc --max-line-length=120 --exclude dcc/migrations
+  - name: showmigrations
+    image: python:3
+    commands:
+      - python manage.py showmigrations
   - name: publish
     image: plugins/docker
     settings:
