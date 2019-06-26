@@ -32,7 +32,14 @@ services:
             - backend
 
     djangoweb:
-        image: zazu.crc.nd.edu/cookiecutters/django-cc
+        build:
+            context: .
+            # dockerfile: docker/django.Dockerfile
+            args:
+                # - WEB_SERVER_NAME
+                - ENVIRONMENT=${ENVIRONMENT:-production}
+
+        image: djangoapp:latest
         networks:
             - backend
             - frontend
@@ -64,30 +71,6 @@ services:
             - ADMIN_RESET
         links:
             - "postgresdb"
-
-    # NGINX Reverse Proxy
-    # Routes requests that require processing to Django
-    # and directly serves static files.
-    nginx:
-        image: nginx:1.15
-        restart: always
-        depends_on:
-            - djangoweb
-        networks:
-            - frontend
-        ports:
-            # Map standard HTTP/HTTPS ports from the host
-            # to the NGINX container.
-            - 80:80
-            - 443:443
-        volumes:
-            - ./certs:/etc/ssl
-            - ./config/nginx/dcc.conf:/etc/nginx/conf.d/dcc.conf
-            - volume_django_static:/var/staticfiles
-            - volume_django_media:/var/mediafiles
-        environment: # NOTE: Without
-            - WEB_SERVER_NAME
-            - FORCE_SCRIPT_NAME
 
 networks:
     frontend:
