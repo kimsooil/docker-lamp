@@ -4,14 +4,25 @@ name: default
 workspace:
   base: /go
   path: src/github.com/crcresearch/dcc
+  
+services:
+- name: database
+  image: postgres
+  environment:
+    POSTGRES_DB: django
+    POSTGRES_USER: django
+    POSTGRES_PASSWORD: django
 
 steps:
   - name: requirements
     image: python:3
     commands:
-      - pip install -r requirements/base.txt
-      - pip install -r requirements/production.txt
-      - pip install -r requirements/custom.txt
+      - mkdir python_modules
+      - pip install --target=$PWD/python_modules -r requirements/base.txt
+      - pip install --target=$PWD/python_modules -r requirements/production.txt
+      - pip install --target=$PWD/python_modules -r requirements/development.txt
+      - pip install --target=$PWD/python_modules -r requirements/custom.txt
+      - cp sample.env .env
   # - name: flake8
   #   image: python:3
   #   commands:
@@ -19,8 +30,40 @@ steps:
   #    - pip install -r requirements/production.txt
   #    - pip install -r requirements/custom.txt
   #   #  - flake8 dcc --max-line-length=120 --exclude dcc/migrations
+  - name: showmigrations
+    image: python:3
+    environment:
+      POSTGRES_HOST: database
+    depends_on:
+      - requirements
+    commands:
+      - export PYTHONPATH=$PYTHONPATH:$PWD/python_modules
+      - export $(grep -v '^#' .env | xargs -d '\n')
+      - bash docker/scripts/generate_secret_key.sh
+      - python manage.py showmigrations
+  - name: flake8
+    image: python:3
+    commands:
+      - export PYTHONPATH=$PYTHONPATH:$PWD/python_modules
+      - python -m flake8 --select E --max-line-length=120 dcc 
+    depends_on:
+      - requirements
+  - name: clean_up_python
+    image: python:3
+    depends_on:
+      - flake8
+      - showmigrations
+    commands:
+      - rm -rf python_modules
   - name: publish
     image: plugins/docker
+    depends_on:
+      - clean_up_python
+    when:
+      branch:
+        - master
+      event:
+        - push
     settings:
       username:
         from_secret: DOCKER_REGISTRY_USERNAME

@@ -29,7 +29,7 @@ from users import urls as users_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
+
     path('users/', include(users_urls)),
 
     # re_path(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),

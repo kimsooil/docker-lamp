@@ -1,15 +1,17 @@
-from django.core.management.base import BaseCommand, CommandError
-
 import environ
-env = environ.Env()
+
+from django.core.management.base import BaseCommand
 
 from users.models import User
+
+env = environ.Env()
+
 
 class Command(BaseCommand):
     help = 'Displays current time'
 
     def handle(self, *args, **kwargs):
-        email=env('ADMIN_EMAIL', default=None)
+        email = env('ADMIN_EMAIL', default=None)
 
         if email:
             if not User.objects.filter(email=email).exists():
