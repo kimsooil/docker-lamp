@@ -59,11 +59,6 @@ steps:
     image: plugins/docker
     depends_on:
       - clean_up_python
-    when:
-      branch:
-        - master
-      event:
-        - push
     settings:
       username:
         from_secret: DOCKER_REGISTRY_USERNAME
@@ -71,8 +66,6 @@ steps:
         from_secret: DOCKER_REGISTRY_PASSWORD
       repo: zazu.crc.nd.edu/cookiecutters/django-cc
       registry: zazu.crc.nd.edu
+      auto_tag: true
       build_args:
         - ENVIRONMENT=production
-      tags:
-        - latest
-        - '1.0'
