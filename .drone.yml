@@ -23,13 +23,6 @@ steps:
       - pip install --target=$PWD/python_modules -r requirements/development.txt
       - pip install --target=$PWD/python_modules -r requirements/custom.txt
       - cp sample.env .env
-  # - name: flake8
-  #   image: python:3
-  #   commands:
-  #    - pip install -r requirements/base.txt
-  #    - pip install -r requirements/production.txt
-  #    - pip install -r requirements/custom.txt
-  #   #  - flake8 dcc --max-line-length=120 --exclude dcc/migrations
   - name: showmigrations
     image: python:3
     environment:
@@ -40,7 +33,6 @@ steps:
       - export PYTHONPATH=$PYTHONPATH:$PWD/python_modules
       - export $(grep -v '^#' .env | xargs -d '\n')
       - bash docker/scripts/generate_secret_key.sh
-      - python manage.py showmigrations
   - name: flake8
     image: python:3
     commands:
@@ -69,7 +61,7 @@ steps:
         from_secret: DOCKER_REGISTRY_USERNAME
       password:
         from_secret: DOCKER_REGISTRY_PASSWORD
-      repo: zazu.crc.nd.edu/cookiecutters/django-cc
+      repo: zazu.crc.nd.edu/aegis/django-cc
       registry: zazu.crc.nd.edu
       build_args:
         - ENVIRONMENT=production
