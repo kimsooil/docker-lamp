@@ -35,7 +35,7 @@ with open(os.path.join(BASE_DIR, 'secretkey.txt')) as f:
 # SECRET_KEY = ENV['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False if ENV('ENVIRONMENT') == 'production' else True
+DEBUG = False if ENV('DJANGO_ENVIRONMENT') == 'production' else True
 
 ALLOWED_HOSTS = ENV.list('DJANGO_ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
@@ -98,7 +98,7 @@ OAUTH2_PROVIDER = {
 }
 
 # If not production, add rest framework.
-if not ENV('ENVIRONMENT') == 'production':
+if not ENV('DJANGO_ENVIRONMENT') == 'production':
     THIRD_PARTY_APPS.append('rest_framework_swagger')
 
 LOCAL_APPS = [
@@ -269,5 +269,5 @@ STATIC_URL = '/static/'
 # ]
 STATIC_ROOT = '/var/staticfiles/'
 
-MEDIA_ROOT = '/var/mediafiles/' if ENV('ENVIRONMENT') == 'production' else os.path.join(BASE_DIR, 'media/')
+MEDIA_ROOT = '/var/mediafiles/' if ENV('DJANGO_ENVIRONMENT') == 'production' else os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'

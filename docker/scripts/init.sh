@@ -15,13 +15,13 @@ python manage.py init_admin_user
 # python docker/scripts/create_admin.py
 
 # Collect static for non-development.
-if [ "$ENVIRONMENT" != "development" ]
+if [ "$DJANGO_ENVIRONMENT" != "development" ]
 then
 python manage.py collectstatic --no-input
 fi
 
 # manage.py for development, otherwise, gunicorn
-if [ "$ENVIRONMENT" = "development" ]
+if [ "$DJANGO_ENVIRONMENT" = "development" ]
 then
 python manage.py runserver 0.0.0.0:8000
 else

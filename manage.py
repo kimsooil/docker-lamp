@@ -5,7 +5,7 @@ import environ
 ENV = environ.Env()
 
 if __name__ == '__main__':
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', ENV('DJANGO_SETTINGS_MODULE'))
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dcc.config.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

@@ -1,7 +1,7 @@
 FROM python:3
 ENV PYTHONUNBUFFERED 1
 
-ARG BUILD_ENVIRONMENT
+ARG DJANGO_ENVIRONMENT
 
 # Make the static/media folder.
 RUN mkdir /var/staticfiles
@@ -20,7 +20,7 @@ RUN pip install --upgrade pip
 
 # Install requirements for Django
 RUN pip install -r requirements/base.txt
-RUN pip install -r requirements/${BUILD_ENVIRONMENT}.txt
+RUN pip install -r requirements/${DJANGO_ENVIRONMENT}.txt
 RUN pip install -r requirements/custom.txt
 
 # Expose the port so we can access Django as it's running
