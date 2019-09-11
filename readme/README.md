@@ -236,6 +236,19 @@ docker exec -it container-name bash
 python3 manage.py createsuperuser
 ```
 
+##### Work with the database.
+
+```sh
+# Connect to the database container.
+docker exec -it database-container-name bash
+
+# Switch to postgres user.
+datbaase-container-name# su - postgres
+
+datbaase-container-name# psql -U database-user database-name
+```
+
+
 ## Flake8 commands.
 
 Running flake8 to check code for things.
