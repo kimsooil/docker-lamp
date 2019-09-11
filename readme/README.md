@@ -38,6 +38,9 @@ git clone https://github.com/crcresearch/crc-dcc.git project-name-crc-dcc
 
 #### New GitHub repo.
 
+##### Method 1: Upstream
+**NOTE: Only needed if you wish to be able to get updates directly via upstream**
+
 Create a new, empty GitHub repo for your new project.
 
 #### Change the 'origin' url.
@@ -50,13 +53,13 @@ This step allows you to switch the source of your repository to your new project
 git remote set-url origin https://github.com/crcresearch/project-name-crc-dcc.git
 ```
 
-#### Push your new repo.
+##### Push your new repo.
 
 ```sh
 git push -u origin master
 ```
 
-#### Upstream.
+##### Upstream.
 
 Add the base git repo as an upstream.
 
@@ -66,13 +69,13 @@ Add the base git repo as an upstream.
 git remote add upstream https://github.com/crcresearch/crc-dcc.git
 ```
 
-#### remotes
+##### remotes
 
 ```sh
 git remote -v
 ```
 
-##### result
+###### result
 
 ```sh
 origin	https://github.com/crcresearch/project-name-crc-dcc.git (fetch)
@@ -89,17 +92,17 @@ upstream	https://github.com/crcresearch/crc-dcc.git (push)
 git remote rm upstream
 ```
 
-### Updating from upstream.
+##### Updating from upstream.
 
 Let's say that the base CRC-DCC is updated. How do you get the changes to your fork? 
 
-#### Get the updates from upstream.
+##### Get the updates from upstream.
 
 ```sh
 git fetch upstream
 ```
 
-#### Select branch to update.
+##### Select branch to update.
 
 It is recommended that you update your develop branch (or a test branch) instead of master. We will try to not have breaking changes, but, this will allow you to test your repo in case there are any issues before adding this.
 
@@ -107,7 +110,7 @@ It is recommended that you update your develop branch (or a test branch) instead
 git checkout develop
 ```
 
-#### Rebase
+##### Rebase
 
 Running this command will reabase your selected branch with the upstream's (base CRC-DCC) master branch. 
 
@@ -115,9 +118,39 @@ Running this command will reabase your selected branch with the upstream's (base
 git rebase upstream/master
 ```
 
-#### Update your repo.
+##### Update your repo.
 ```sh
 git push -f origin develop
+```
+
+##### Method 2: Standalone
+
+###### .git to start a new project.
+
+```sh
+rm -rf .git
+```
+
+###### Initialize and commit initial code.
+
+```sh
+git init
+
+git add .
+
+git commit -m "Initial commit."
+```
+
+###### Add remote origin repo.
+
+```sh
+git remote add origin https://github.com/crcresearch/your-new-repo.git
+```
+
+###### Push to your new repo.
+
+```sh
+git push -f origin master
 ```
 
 #### Setup .env file
