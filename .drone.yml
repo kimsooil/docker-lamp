@@ -47,15 +47,13 @@ steps:
       - showmigrations
     commands:
       - rm -rf python_modules
-  - name: publish
+  - name: publish_master
     image: plugins/docker
     depends_on:
       - clean_up_python
     when:
       branch:
         - master
-      event:
-        - push
     settings:
       username:
         from_secret: DOCKER_REGISTRY_USERNAME
@@ -66,3 +64,20 @@ steps:
       auto_tag: true
       build_args:
         - DJANGO_ENVIRONMENT=production
+  - name: publish_tag
+    image: plugins/docker
+    depends_on:
+      - clean_up
+    when:
+      event:
+        - tag
+    settings:
+      username:
+        from_secret: DOCKER_REGISTRY_USERNAME
+      password:
+        from_secret: DOCKER_REGISTRY_PASSWORD
+      repo: zazu.crc.nd.edu/cookiecutters/django-cc
+      registry: zazu.crc.nd.edu
+      auto_tag: true
+      build_args:
+        - ENVIRONMENT=production
