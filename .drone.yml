@@ -54,6 +54,8 @@ steps:
     when:
       branch:
         - master
+      event:
+        - push
     settings:
       username:
         from_secret: DOCKER_REGISTRY_USERNAME
@@ -61,7 +63,7 @@ steps:
         from_secret: DOCKER_REGISTRY_PASSWORD
       repo: zazu.crc.nd.edu/cookiecutters/django-cc
       registry: zazu.crc.nd.edu
-      auto_tag: true
+      tag: 'latest'
       build_args:
         - DJANGO_ENVIRONMENT=production
   - name: publish_tag
