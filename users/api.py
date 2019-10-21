@@ -5,6 +5,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
 from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
 
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework import parsers
@@ -12,10 +13,15 @@ from rest_framework import renderers
 from rest_framework import status
 
 from users.serializers.user_serializers import UserSerializer
+from users.serializers.forgot_password_serializer import PasswordResetSerializer
 
 User = get_user_model()
 
 from oauth2_provider.views.generic import ProtectedResourceView
+
+from rest_framework.permissions import IsAuthenticated, AllowAny
+
+from django.utils.translation import ugettext_lazy as _
 
 # class TestDOAuth2(ProtectedResourceView):
 #     def get(self, request, *args, **kwargs):
@@ -104,3 +110,24 @@ class LogoutAPIView(APIView):
     def post(self, request, *args, **kwargs):
         response = Token.objects.get(user=self.request.user).delete()
         return Response({'response': response})
+
+class ForgotPasswordAPIView(GenericAPIView):
+    """
+    Calls Django Auth PasswordResetForm save method.
+    Accepts the following POST parameters: email
+    Returns the success/fail message.
+    """
+    serializer_class = PasswordResetSerializer
+    permission_classes = (AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        # Create a serializer with request.data
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        serializer.save()
+        # Return the success message with OK HTTP status
+        return Response(
+            {"detail": _("Password reset e-mail has been sent.")},
+            status=status.HTTP_200_OK
+        )

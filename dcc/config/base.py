@@ -242,6 +242,7 @@ REST_FRAMEWORK = {
 EMAIL_BACKEND = ENV('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
 EMAIL_HOST = ENV('DJANGO_EMAIL_HOST', default='localhost')
 EMAIL_PORT = ENV('DJANGO_EMAIL_PORT', default='25')
+DEFAULT_FROM_EMAIL = 'noreply@gmail.com'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
@@ -271,3 +272,4 @@ STATIC_ROOT = '/var/staticfiles/'
 
 MEDIA_ROOT = '/var/mediafiles/' if ENV('DJANGO_ENVIRONMENT') == 'production' else os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
+
