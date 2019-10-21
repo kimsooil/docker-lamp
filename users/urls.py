@@ -7,7 +7,7 @@ from .views import (
     user_detail_view,
 )
 
-from .api import LoginAPIView, UpdateMeAPIView, MeAPIView, LogoutAPIView, ForgotPasswordAPIView
+from .api import LoginAPIView, UpdateMeAPIView, MeAPIView, LogoutAPIView, ForgotPasswordAPIView, PasswordResetAPIView
 
 # from django.contrib.auth.views import LogoutView
 from .views import UserLogoutView
@@ -42,5 +42,5 @@ urlpatterns = [
 
     # Forgot Password
     path("api/forgot-password/", view=ForgotPasswordAPIView.as_view(), name="forgot-password"),
-    # path('api/password-reset/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm')
+    path('api/reset-password/', view=PasswordResetAPIView.as_view(), name='reset-password')
 ]

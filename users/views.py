@@ -80,5 +80,4 @@ class UserLogoutView(LoginRequiredMixin, FormView):
         print(dir((self.request.user)))
         return User.objects.get(username=self.request.user.username)
 
-
 user_update_view = UserUpdateView.as_view()

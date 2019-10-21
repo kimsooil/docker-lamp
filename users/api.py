@@ -12,8 +12,12 @@ from rest_framework import parsers
 from rest_framework import renderers
 from rest_framework import status
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.debug import sensitive_post_parameters
+
 from users.serializers.user_serializers import UserSerializer
 from users.serializers.forgot_password_serializer import PasswordResetSerializer
+from users.serializers.password_reset_serializer import PasswordResetConfirmSerializer
 
 User = get_user_model()
 
@@ -27,6 +31,11 @@ from django.utils.translation import ugettext_lazy as _
 #     def get(self, request, *args, **kwargs):
 #         return Response({'test': "Hi there!"})
 
+sensitive_post_parameters_m = method_decorator(
+    sensitive_post_parameters(
+        'new_password', 'confirm_new_password'
+    )
+)
 
 class LoginAPIView(ObtainAuthToken):
     """
@@ -130,4 +139,27 @@ class ForgotPasswordAPIView(GenericAPIView):
         return Response(
             {"detail": _("Password reset e-mail has been sent.")},
             status=status.HTTP_200_OK
+        )
+
+class PasswordResetAPIView(GenericAPIView):
+    """
+    Password reset e-mail link is confirmed, therefore
+    this resets the user's password.
+    Accepts the following POST parameters: token, uid,
+        new_password, confirm_new_password
+    Returns the success/fail message.
+    """
+    serializer_class = PasswordResetConfirmSerializer
+    permission_classes = (AllowAny,)
+
+    @sensitive_post_parameters_m
+    def dispatch(self, *args, **kwargs):
+        return super(PasswordResetAPIView, self).dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            {"detail": _("Password has been reset with the new password.")}
         )
