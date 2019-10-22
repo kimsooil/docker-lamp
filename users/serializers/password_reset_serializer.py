@@ -9,7 +9,7 @@ from django.utils.encoding import force_text
 from rest_framework import serializers, exceptions
 from rest_framework.exceptions import ValidationError
 
-from .models import TokenModel
+# from .models import TokenModel
 # from .utils import import_callable
 
 # Get the UserModel
