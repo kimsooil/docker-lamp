@@ -18,6 +18,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from users.serializers.user_serializers import UserSerializer
 from users.serializers.forgot_password_serializer import PasswordResetSerializer
 from users.serializers.password_reset_serializer import PasswordResetConfirmSerializer
+from users.serializers.change_password_serializer import PasswordChangeSerializer
 
 User = get_user_model()
 
@@ -163,3 +164,22 @@ class PasswordResetAPIView(GenericAPIView):
         return Response(
             {"detail": _("Password has been reset with the new password.")}
         )
+
+class PasswordChangeAPIView(ProtectedResourceView, GenericAPIView):
+    """
+    Calls Django Auth SetPasswordForm save method.
+    Accepts the following POST parameters: new_password1, new_password2
+    Returns the success/fail message.
+    """
+    serializer_class = PasswordChangeSerializer
+    permission_classes = ()
+
+    @sensitive_post_parameters_m
+    def dispatch(self, *args, **kwargs):
+        return super(PasswordChangeAPIView, self).dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": _("New password has been saved.")})
