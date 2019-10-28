@@ -16,3 +16,5 @@ media/*
 
 # database file
 db.sqlite3*
+
+.vscode
