@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib.auth.forms import SetPasswordForm # PasswordResetForm
 # from django.contrib.auth.tokens import default_token_generator
 # from django.utils.http import urlsafe_base64_decode as uid_decoder
-# from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 # from django.utils.encoding import force_text
 
 from rest_framework import serializers, exceptions
@@ -25,7 +25,7 @@ class PasswordChangeSerializer(serializers.Serializer):
 
     def __init__(self, *args, **kwargs):
         self.old_password_field_enabled = getattr(
-            settings, 'OLD_PASSWORD_FIELD_ENABLED', False
+            settings, 'OLD_PASSWORD_FIELD_ENABLED', True
         )
         self.logout_on_password_change = getattr(
             settings, 'LOGOUT_ON_PASSWORD_CHANGE', False
