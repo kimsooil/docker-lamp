@@ -1,4 +1,7 @@
-from django.urls import path
+from django.urls import path, include
+
+from .api.group.api import UserGroupViewSet
+from .api.group.admin_api import AdminUserViewSet, AdminGroupViewSet, AdminUserGroupViewSet
 
 from .views import (
     user_list_view,
@@ -14,6 +17,19 @@ from .views import UserLogoutView
 
 # OAuth2 provider views.
 import oauth2_provider.views as oauth2_views
+
+user_group_router = DefaultRouter()
+user_group_router.register(r'user-groups', UserGroupViewSet, basename='user-groups')
+
+admin_user_router = DefaultRouter()
+admin_user_router.register(r'admin-users', AdminUserViewSet, basename='admin-users')
+
+admin_group_router = DefaultRouter()
+admin_group_router.register(r'admin-groups', AdminGroupViewSet, basename='admin-groups')
+
+admin_user_group_router = DefaultRouter()
+admin_user_group_router.register(r'admin-user-group', AdminUserGroupViewSet, basename='admin-user-group')
+
 
 app_name = "users"
 urlpatterns = [
@@ -31,6 +47,12 @@ urlpatterns = [
     # Account and update paths.
     path("api/me/", view=MeAPIView.as_view(), name="api-me"),
     path("api/update/", view=UpdateMeAPIView.as_view(), name="api-update"),
+
+    path("api/", include(user_group_router.urls)),
+
+    path("api/", include(admin_user_router.urls)),
+    path("api/", include(admin_group_router.urls)),
+    path("api/", include(admin_user_group_router.urls)),
     
     # HTML Logout.
     path("logout/", view=UserLogoutView.as_view(), name="logout"),
