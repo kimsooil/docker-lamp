@@ -3,7 +3,7 @@
     "model": "auth.group",
     "pk": 3,
     "fields": {
-      "name": "Site PI",
+      "name": "Group 1",
       "permissions": []
     }
   },
@@ -11,7 +11,7 @@
     "model": "auth.group",
     "pk": 4,
     "fields": {
-      "name": "Site Manager",
+      "name": "Group 2",
       "permissions": []
     }
   },
@@ -19,7 +19,7 @@
     "model": "auth.group",
     "pk": 5,
     "fields": {
-      "name": "Project PI",
+      "name": "Group 3",
       "permissions": []
     }
   },
@@ -27,7 +27,7 @@
     "model": "auth.group",
     "pk": 6,
     "fields": {
-      "name": "Scientific Director",
+      "name": "Group 4",
       "permissions": []
     }
   },
@@ -35,31 +35,7 @@
     "model": "auth.group",
     "pk": 7,
     "fields": {
-      "name": "Independent Statistician",
-      "permissions": []
-    }
-  },
-  {
-    "model": "auth.group",
-    "pk": 8,
-    "fields": {
-      "name": "Social Science Manager",
-      "permissions": []
-    }
-  },
-  {
-    "model": "auth.group",
-    "pk": 9,
-    "fields": {
-      "name": "Monitoring",
-      "permissions": []
-    }
-  },
-  {
-    "model": "auth.group",
-    "pk": 10,
-    "fields": {
-      "name": "Study Statistician",
+      "name": "Group 5",
       "permissions": []
     }
   }
