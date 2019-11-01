@@ -1,7 +1,9 @@
 from django.urls import path, include
 
-from .api.group.api import UserGroupViewSet
-from .api.group.admin_api import AdminUserViewSet, AdminGroupViewSet, AdminUserGroupViewSet
+from .api_users.group.api import UserGroupViewSet
+from .api_users.group.admin_api import AdminUserViewSet, AdminGroupViewSet, AdminUserGroupViewSet
+
+from rest_framework.routers import DefaultRouter
 
 from .views import (
     user_list_view,
@@ -111,4 +113,13 @@ urlpatterns = [
         view=PasswordChangeAPIView.as_view(),
         name='change-password'
     ),
+    path("api/forgot-password/", view=ForgotPasswordAPIView.as_view(), name="forgot-password"),
+    path('api/reset-password/', view=PasswordResetAPIView.as_view(), name='reset-password'),
+
+    # Groups
+    path("api/", include(user_group_router.urls)),
+
+    path("api/", include(admin_user_router.urls)),
+    path("api/", include(admin_group_router.urls)),
+    path("api/", include(admin_user_group_router.urls)),
 ]

@@ -14,6 +14,9 @@ python manage.py migrate
 python manage.py init_admin_user
 # python docker/scripts/create_admin.py
 
+# Load group data from fixtures.
+python manage.py loaddata users/fixtures/group_data.json
+
 # Collect static for non-development.
 if [ "$DJANGO_ENVIRONMENT" != "development" ]
 then
