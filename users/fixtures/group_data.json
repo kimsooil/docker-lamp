@@ -3,40 +3,8 @@
     "model": "auth.group",
     "pk": 3,
     "fields": {
-      "name": "Group 1",
+      "name": "Sample Group",
       "permissions": []
     }
   },
-  {
-    "model": "auth.group",
-    "pk": 4,
-    "fields": {
-      "name": "Group 2",
-      "permissions": []
-    }
-  },
-  {
-    "model": "auth.group",
-    "pk": 5,
-    "fields": {
-      "name": "Group 3",
-      "permissions": []
-    }
-  },
-  {
-    "model": "auth.group",
-    "pk": 6,
-    "fields": {
-      "name": "Group 4",
-      "permissions": []
-    }
-  },
-  {
-    "model": "auth.group",
-    "pk": 7,
-    "fields": {
-      "name": "Group 5",
-      "permissions": []
-    }
-  }
 ]

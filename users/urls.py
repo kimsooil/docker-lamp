@@ -5,14 +5,7 @@ from .api_users.group.admin_api import AdminUserViewSet, AdminGroupViewSet, Admi
 
 from rest_framework.routers import DefaultRouter
 
-from .views import (
-    user_list_view,
-    user_redirect_view,
-    user_update_view,
-    user_detail_view,
-)
-
-from .api import LoginAPIView, UpdateMeAPIView, MeAPIView, LogoutAPIView, ForgotPasswordAPIView, PasswordResetAPIView, PasswordChangeAPIView
+from .api import UpdateMeAPIView, MeAPIView, ForgotPasswordAPIView, PasswordResetAPIView, PasswordChangeAPIView
 
 # from django.contrib.auth.views import LogoutView
 from .views import UserLogoutView
@@ -22,23 +15,6 @@ import oauth2_provider.views as oauth2_views
 
 user_group_router = DefaultRouter()
 user_group_router.register(r'user-groups', UserGroupViewSet, basename='user-groups')
-<<<<<<< HEAD
-=======
-
-admin_user_router = DefaultRouter()
-admin_user_router.register(r'admin-users', AdminUserViewSet, basename='admin-users')
-
-admin_group_router = DefaultRouter()
-admin_group_router.register(r'admin-groups', AdminGroupViewSet, basename='admin-groups')
-
-admin_user_group_router = DefaultRouter()
-admin_user_group_router.register(r'admin-user-group', AdminUserGroupViewSet, basename='admin-user-group')
-
-
-app_name = "users"
-urlpatterns = [
-    # path("", view=user_list_view, name="list"),
->>>>>>> 554dba934776c16baecf3d3c1ba8fe365c7e355b
 
 admin_user_router = DefaultRouter()
 admin_user_router.register(r'admin-users', AdminUserViewSet, basename='admin-users')
@@ -64,17 +40,6 @@ urlpatterns = [
         oauth2_views.RevokeTokenView.as_view(),
         name="revoke-token"
     ),
-    # Login/LOgout paths.
-    path(
-        "api/login/",
-        view=LoginAPIView.as_view(),
-        name="api-login"
-    ),
-    path(
-        "api/logout/",
-        view=LogoutAPIView.as_view(),
-        name="api-logout-everywhere"
-    ),
     # Account and update paths.
     path(
         "api/me/",
@@ -85,30 +50,6 @@ urlpatterns = [
         "api/update/",
         view=UpdateMeAPIView.as_view(),
         name="api-update"
-    ),
-    path("api/me/", view=MeAPIView.as_view(), name="api-me"),
-    path("api/update/", view=UpdateMeAPIView.as_view(), name="api-update"),
-
-    path("api/", include(user_group_router.urls)),
-
-    path("api/", include(admin_user_router.urls)),
-    path("api/", include(admin_group_router.urls)),
-    path("api/", include(admin_user_group_router.urls)),
-    
-    # HTML Logout.
-    path("logout/", view=UserLogoutView.as_view(), name="logout"),
-
-    path("api/", include(user_group_router.urls)),
-
-    path("api/", include(admin_user_router.urls)),
-    path("api/", include(admin_group_router.urls)),
-    path("api/", include(admin_user_group_router.urls)),
-    
-    # HTML Logout.
-    path(
-        "logout/",
-        view=UserLogoutView.as_view(),
-        name="logout"
     ),
     path(
         "~redirect/",
@@ -125,7 +66,7 @@ urlpatterns = [
         view=user_detail_view,
         name="detail"
     ),
-    # Forgot Password
+    # Reset Password
     path(
         "api/forgot-password/",
         view=ForgotPasswordAPIView.as_view(),
@@ -136,18 +77,27 @@ urlpatterns = [
         view=PasswordResetAPIView.as_view(),
         name='reset-password'
     ),
+    # Change Password
     path(
         'api/change-password/',
         view=PasswordChangeAPIView.as_view(),
         name='change-password'
     ),
-    path("api/forgot-password/", view=ForgotPasswordAPIView.as_view(), name="forgot-password"),
-    path('api/reset-password/', view=PasswordResetAPIView.as_view(), name='reset-password'),
-
     # Groups
-    path("api/", include(user_group_router.urls)),
-
-    path("api/", include(admin_user_router.urls)),
-    path("api/", include(admin_group_router.urls)),
-    path("api/", include(admin_user_group_router.urls)),
+    path(
+        "api/",
+        include(user_group_router.urls)
+    ),
+    path(
+        "api/",
+        include(admin_user_router.urls)
+    ),
+    path(
+        "api/",
+        include(admin_group_router.urls)
+    ),
+    path(
+        "api/",
+        include(admin_user_group_router.urls)
+    )
 ]

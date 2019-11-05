@@ -15,6 +15,7 @@ from users.serializers.group import GroupSerializer
 
 User = get_user_model()
 
+
 class UserGroupViewSet(ProtectedResourceView, viewsets.ViewSet):
     """
     Return a user's groups.
