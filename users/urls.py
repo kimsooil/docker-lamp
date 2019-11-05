@@ -22,6 +22,23 @@ import oauth2_provider.views as oauth2_views
 
 user_group_router = DefaultRouter()
 user_group_router.register(r'user-groups', UserGroupViewSet, basename='user-groups')
+<<<<<<< HEAD
+=======
+
+admin_user_router = DefaultRouter()
+admin_user_router.register(r'admin-users', AdminUserViewSet, basename='admin-users')
+
+admin_group_router = DefaultRouter()
+admin_group_router.register(r'admin-groups', AdminGroupViewSet, basename='admin-groups')
+
+admin_user_group_router = DefaultRouter()
+admin_user_group_router.register(r'admin-user-group', AdminUserGroupViewSet, basename='admin-user-group')
+
+
+app_name = "users"
+urlpatterns = [
+    # path("", view=user_list_view, name="list"),
+>>>>>>> 554dba934776c16baecf3d3c1ba8fe365c7e355b
 
 admin_user_router = DefaultRouter()
 admin_user_router.register(r'admin-users', AdminUserViewSet, basename='admin-users')
@@ -69,6 +86,17 @@ urlpatterns = [
         view=UpdateMeAPIView.as_view(),
         name="api-update"
     ),
+    path("api/me/", view=MeAPIView.as_view(), name="api-me"),
+    path("api/update/", view=UpdateMeAPIView.as_view(), name="api-update"),
+
+    path("api/", include(user_group_router.urls)),
+
+    path("api/", include(admin_user_router.urls)),
+    path("api/", include(admin_group_router.urls)),
+    path("api/", include(admin_user_group_router.urls)),
+    
+    # HTML Logout.
+    path("logout/", view=UserLogoutView.as_view(), name="logout"),
 
     path("api/", include(user_group_router.urls)),
 
