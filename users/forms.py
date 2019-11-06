@@ -3,7 +3,6 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from django.contrib.auth import forms as auth_forms
-from django import forms
 
 User = get_user_model()
 
@@ -32,6 +31,7 @@ class UserCreationForm(auth_forms.UserCreationForm):
             return username
 
         raise ValidationError(self.error_messages["duplicate_username"])
+
 
 class LogoutForm(forms.Form):
     pass

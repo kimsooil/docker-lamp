@@ -7,9 +7,6 @@ from rest_framework.routers import DefaultRouter
 
 from .api import UpdateMeAPIView, MeAPIView, ForgotPasswordAPIView, PasswordResetAPIView, PasswordChangeAPIView
 
-# from django.contrib.auth.views import LogoutView
-from .views import UserLogoutView
-
 # OAuth2 provider views.
 import oauth2_provider.views as oauth2_views
 
@@ -51,21 +48,21 @@ urlpatterns = [
         view=UpdateMeAPIView.as_view(),
         name="api-update"
     ),
-    path(
-        "~redirect/",
-        view=user_redirect_view,
-        name="redirect"
-    ),
-    path(
-        "~update/",
-        view=user_update_view,
-        name="update"
-    ),
-    path(
-        "<str:username>/",
-        view=user_detail_view,
-        name="detail"
-    ),
+    # path(
+    #     "~redirect/",
+    #     view=user_redirect_view,
+    #     name="redirect"
+    # ),
+    # path(
+    #     "~update/",
+    #     view=user_update_view,
+    #     name="update"
+    # ),
+    # path(
+    #     "<str:username>/",
+    #     view=user_detail_view,
+    #     name="detail"
+    # ),
     # Reset Password
     path(
         "api/forgot-password/",

@@ -2,9 +2,8 @@ from django.conf import settings
 
 from django.contrib.auth.forms import PasswordResetForm
 
+from rest_framework import serializers
 
-from rest_framework import serializers, exceptions
-from rest_framework.exceptions import ValidationError
 
 class PasswordResetSerializer(serializers.Serializer):
     """

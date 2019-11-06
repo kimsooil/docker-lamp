@@ -1,7 +1,5 @@
 from django.contrib.auth import get_user_model
 
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
 from rest_framework.views import APIView
@@ -20,13 +18,13 @@ from users.serializers.forgot_password_serializer import PasswordResetSerializer
 from users.serializers.password_reset_serializer import PasswordResetConfirmSerializer
 from users.serializers.change_password_serializer import PasswordChangeSerializer
 
-User = get_user_model()
-
 from oauth2_provider.views.generic import ProtectedResourceView
 
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
 
 from django.utils.translation import ugettext_lazy as _
+
+User = get_user_model()
 
 
 sensitive_post_parameters_m = method_decorator(
@@ -68,7 +66,7 @@ class UpdateMeAPIView(APIView):
 
     def put(self, request, *args, **kwargs):
         user = User.objects.get(id=self.request.user.id)
-        
+
         # Check that the data is valid using the serializer.
         serializer = UserSerializer(user, data=request.data)
         if serializer.is_valid():
@@ -84,7 +82,7 @@ class UpdateMeAPIView(APIView):
             user.username = request.data['username']
             user.save()
             return Response(serializer.data)
-        
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -132,6 +130,7 @@ class PasswordResetAPIView(GenericAPIView):
         return Response(
             {"detail": _("Password has been reset with the new password.")}
         )
+
 
 class PasswordChangeAPIView(ProtectedResourceView, GenericAPIView):
     """

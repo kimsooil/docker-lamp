@@ -1,10 +1,9 @@
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import get_user_model
 from django.conf import settings
-from django.contrib.auth.forms import SetPasswordForm 
+from django.contrib.auth.forms import SetPasswordForm
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework import serializers, exceptions
-from rest_framework.exceptions import ValidationError
+from rest_framework import serializers
 
 # Get the UserModel
 UserModel = get_user_model()

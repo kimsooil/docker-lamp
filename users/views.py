@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.views.generic import DetailView, ListView, RedirectView, UpdateView, FormView
 
-from django.contrib.auth import logout
+# from django.contrib.auth import logout
 
 User = get_user_model()
 
@@ -66,6 +66,7 @@ user_redirect_view = UserRedirectView.as_view()
 #         logout(self.request)
 #         return super().form_valid(form)
 
+
 class UserLogoutView(LoginRequiredMixin, FormView):
 
     model = User
@@ -79,5 +80,6 @@ class UserLogoutView(LoginRequiredMixin, FormView):
     def get_object(self):
         print(dir((self.request.user)))
         return User.objects.get(username=self.request.user.username)
+
 
 user_update_view = UserUpdateView.as_view()

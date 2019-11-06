@@ -1,16 +1,13 @@
 from django.contrib.auth import get_user_model
 
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from rest_framework import viewsets
 from rest_framework import parsers
 from rest_framework import renderers
-from rest_framework import status
 
 from oauth2_provider.views.generic import ProtectedResourceView
 
-from users.serializers.user_serializers import UserSerializer
 from users.serializers.group import GroupSerializer
 
 User = get_user_model()
