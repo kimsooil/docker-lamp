@@ -97,6 +97,9 @@ OAUTH2_PROVIDER = {
     'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore'
 }
 
+# Keep token valid for 2 weeks.
+ACCESS_TOKEN_EXPIRE_SECONDS = 1209600
+
 # If not production, add rest framework.
 if not ENV('DJANGO_ENVIRONMENT') == 'production':
     THIRD_PARTY_APPS.append('rest_framework_swagger')
