@@ -94,11 +94,9 @@ THIRD_PARTY_APPS = [
 
 OAUTH2_PROVIDER = {
     # other OAUTH2 settings
-    'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore'
+    'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore',
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 1209600
 }
-
-# Keep token valid for 2 weeks.
-ACCESS_TOKEN_EXPIRE_SECONDS = 1209600
 
 # If not production, add rest framework.
 if not ENV('DJANGO_ENVIRONMENT') == 'production':
