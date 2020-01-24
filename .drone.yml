@@ -37,7 +37,8 @@ steps:
     image: python:3
     commands:
       - export PYTHONPATH=$PYTHONPATH:$PWD/python_modules
-      - python -m flake8 --select E --max-line-length=120 dcc 
+      # - python -m flake8 --select E --max-line-length=120 dcc 
+      - python -m flake8 dcc --config=flake8.cfg --select E
     depends_on:
       - requirements
   - name: clean_up_python
