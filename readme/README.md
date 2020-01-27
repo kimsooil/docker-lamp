@@ -251,7 +251,15 @@ datbaase-container-name# psql -U database-user database-name
 
 ## Flake8 commands.
 
-Running flake8 to check code for things.
+Run flake8, using the included *flake8.cfg* Modify this file as you wish.
+
+**Ref:** http://flake8.pycqa.org/en/latest/user/options.html
+
+```sh
+docker exec container-name flake8 kenya --config=flake8.cfg
+```
+
+Another common way to run it without using a config file.
 
 ```sh
 docker exec container-name flake8 app --max-line-length=120 [--exclude] [directory/to/exclude]

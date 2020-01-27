@@ -1,19 +1,20 @@
-print("---------------------------------------------Start Create Admin User")
-
 import environ
-env = environ.Env()
-
 import django
-django.setup()
 
 from users.models import User
 
-email=env('ADMIN_EMAIL', default=None)
+env = environ.Env()
+
+django.setup()
+
+email = env('ADMIN_EMAIL', default=None)
+
+print("---------------------------------------------Start Create Admin User")
 
 if email:
-    print (email)
+    print(email)
     if not User.objects.filter(email=email).exists():
-        print ("Admin user doesn't exist.")
+        print("Admin user doesn't exist.")
         user = User.objects.create_user(
             is_staff=True,
             is_superuser=True,
@@ -21,7 +22,7 @@ if email:
             email=email,
             password=env('ADMIN_PASSWORD')
         )
-        print ("Created admin user: ", user.email)
+        print("Created admin user: ", user.email)
     elif bool(env('ADMIN_RESET', default=False)):
         print("Reset password....")
         user = User.objects.get(email=email)

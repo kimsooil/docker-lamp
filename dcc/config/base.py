@@ -273,4 +273,3 @@ STATIC_ROOT = '/var/staticfiles/'
 
 MEDIA_ROOT = '/var/mediafiles/' if ENV('DJANGO_ENVIRONMENT') == 'production' else os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
-
