@@ -271,7 +271,7 @@ This is a good summary of how wagtail is being used in the project [https://docs
 
 ### Getting Started
 
-Wagtail is already installed. It can be disabled whenever needed.
+Wagtail is included, however, it is commented out. Search for **Wagtail - Uncomment below to use** in this project to find all the places to uncomment.
 
 **NOTE:** Migrations will be run 
 

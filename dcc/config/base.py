@@ -42,8 +42,8 @@ ALLOWED_HOSTS = ENV.list('DJANGO_ALLOWED_HOSTS', default=['localhost', '127.0.0.
 # Sets the 'prefix' of ALL django paths. DO NOT INCLUDE THIS IN YOUR URLS.
 FORCE_SCRIPT_NAME = ENV('FORCE_SCRIPT_NAME', default=None)
 
-# Wagtail.
-WAGTAIL_SITE_NAME = 'Django Cookie Cutter!'
+# Wagtail - Uncomment below to use.
+# WAGTAIL_SITE_NAME = 'Django Cookie Cutter!'
 
 # APPS
 # ------------------------------------------------------------------------------
@@ -66,21 +66,21 @@ THIRD_PARTY_APPS = [
     # # Allows for generating secret key.
     # 'django_generate_secret_key',
 
-    # Wagtail.
-    'wagtail.contrib.forms',
-    'wagtail.contrib.redirects',
-    'wagtail.embeds',
-    'wagtail.sites',
-    'wagtail.users',
-    'wagtail.snippets',
-    'wagtail.documents',
-    'wagtail.images',
-    'wagtail.search',
-    'wagtail.admin',
-    'wagtail.core',
+    # Wagtail - Uncomment below to use.
+    # 'wagtail.contrib.forms',
+    # 'wagtail.contrib.redirects',
+    # 'wagtail.embeds',
+    # 'wagtail.sites',
+    # 'wagtail.users',
+    # 'wagtail.snippets',
+    # 'wagtail.documents',
+    # 'wagtail.images',
+    # 'wagtail.search',
+    # 'wagtail.admin',
+    # 'wagtail.core',
 
-    'modelcluster',
-    'taggit',
+    # 'modelcluster',
+    # 'taggit',
 
     # For the users app.
     'crispy_forms',
@@ -141,9 +141,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    # Wagtail.
-    'wagtail.core.middleware.SiteMiddleware',
-    'wagtail.contrib.redirects.middleware.RedirectMiddleware',
+    # Wagtail - Uncomment below to use.
+    # 'wagtail.core.middleware.SiteMiddleware',
+    # 'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
 
 # False by default, but, can be modified to True for mobile applications.
