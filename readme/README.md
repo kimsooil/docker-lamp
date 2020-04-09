@@ -232,7 +232,7 @@ docker exec -it container-name bash
 
 #### Create superuser.
 
-```python
+```sh
 python3 manage.py createsuperuser
 ```
 
@@ -277,4 +277,4 @@ Wagtail is included, however, it is commented out. Search for **Wagtail - Uncomm
 
 ## DRF
 
-Since the emphais will be on using DRF + Frontend JS Framework, *django-cors-headers* is needed. cors allows django to add CORS headers to responses. This allows the frontend application (VueJS, ReactJS, Angular, Mobile apps, etc.) to get/post data from the Django application. In the case of development, this is necessarity because, when creating a single page app, the development happens on a separae port, and, as such, the Django application needs to allow Cross-Origin.
+Since the emphasis will be on using DRF + Frontend JS Framework, *django-cors-headers* is needed. cors allows django to add CORS headers to responses. This allows the frontend application (VueJS, ReactJS, Angular, Mobile apps, etc.) to get/post data from the Django application. In the case of development, this is necessarity because, when creating a single page app, the development happens on a separae port, and, as such, the Django application needs to allow Cross-Origin.
