@@ -62,7 +62,7 @@ steps:
         from_secret: DOCKER_REGISTRY_USERNAME
       password:
         from_secret: DOCKER_REGISTRY_PASSWORD
-      repo: zazu.crc.nd.edu/cookiecutters/django-cc
+      repo: zazu.crc.nd.edu/covid/backend
       registry: zazu.crc.nd.edu
       tag: 'latest'
       build_args:
@@ -79,7 +79,7 @@ steps:
         from_secret: DOCKER_REGISTRY_USERNAME
       password:
         from_secret: DOCKER_REGISTRY_PASSWORD
-      repo: zazu.crc.nd.edu/cookiecutters/django-cc
+      repo: zazu.crc.nd.edu/covid/backend
       registry: zazu.crc.nd.edu
       auto_tag: true
       build_args:
