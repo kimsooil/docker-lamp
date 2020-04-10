@@ -70,7 +70,7 @@ steps:
   - name: publish_tag
     image: plugins/docker
     depends_on:
-      - clean_up
+      - clean_up_python
     when:
       event:
         - tag
