@@ -3,7 +3,7 @@ name: default
 
 workspace:
   base: /go
-  path: src/github.com/crcresearch/dcc
+  path: src/github.com/crcresearch/covid-backend
   
 services:
 - name: database
