@@ -11,7 +11,7 @@ from .base import *
 
 ENV = environ.Env()
 
-MODEL_API_BASE_URL = ENV('DJANGO_EMAIL_BACKEND', default='http://localhost:5000/')
-MODEL_API_SUBPATH = ENV('DJANGO_EMAIL_BACKEND', default='/model/')
+MODEL_API_BASE_URL = ENV('MODEL_API_BASE_URL', default='http://localhost:5000/')
+MODEL_API_SUBPATH = ENV('MODEL_API_SUBPATH', default='/model/')
 
 
