@@ -29,7 +29,7 @@ then
 python manage.py runserver 0.0.0.0:8000
 else
 # gunicorn wsgi:application --bind 0.0.0.0:8000
-gunicorn dcc.wsgi:application --bind 0.0.0.0:8000
+gunicorn dcc.wsgi:application --bind 0.0.0.0:8000 --timeout 90
 fi
 
 # # Execute anything in the "CMD" definition
