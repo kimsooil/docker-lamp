@@ -66,7 +66,7 @@ steps:
       registry: zazu.crc.nd.edu
       tag: 'latest'
       build_args:
-        - DJANGO_ENVIRONMENT=production
+        - DJANGO_ENVIRONMENT=development
   - name: publish_tag
     image: plugins/docker
     depends_on:
