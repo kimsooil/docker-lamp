@@ -25,6 +25,7 @@ from django.urls import path, re_path, include
 
 from .views import HomeView, AboutView, HelpView
 from .views import ExampleAuthenticatedView, ExampleView
+from covid.views import ProxyToModelAPIView
 
 from users import urls as users_urls
 
@@ -38,6 +39,7 @@ urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('about/', AboutView.as_view(), name='about'),
     path('help/', HelpView.as_view(), name='help'),
+    re_path(r'^model', ProxyToModelAPIView.as_view(), name='model-proxy'),
 
     # Wagtail - Uncomment below to use.
     # re_path(r'^cms/', include(wagtailadmin_urls)),
