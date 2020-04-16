@@ -104,8 +104,9 @@ if not ENV('DJANGO_ENVIRONMENT') == 'production':
 
 LOCAL_APPS = [
     'users.apps.UsersAppConfig',
-    'dcc'
+    'dcc',
     # Your stuff: custom apps go here
+    'covid'
 ]
 
 # # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
