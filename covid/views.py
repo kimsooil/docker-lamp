@@ -14,7 +14,7 @@ class ProxyToModelAPIView(ProtectedResourceView, APIView):
         api_path = request.get_full_path().replace(settings.MODEL_API_SUBPATH, settings.MODEL_API_BASE_URL)
         r = requests.get(api_path)
         
-        return Response(r.json())
+        return Response(r.json(), status=r.status_code)
 
 class HardCodedModelOutputAPIView(ProtectedResourceView, APIView):
 
