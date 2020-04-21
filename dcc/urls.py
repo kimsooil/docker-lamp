@@ -25,7 +25,7 @@ from django.urls import path, re_path, include
 
 from .views import HomeView, AboutView, HelpView
 from .views import ExampleAuthenticatedView, ExampleView
-from covid.views import ProxyToModelAPIView, HardCodedModelOutputAPIView
+from covid.views import ProxyToModelAPIView, SystemConfigurationAPIView
 
 from users import urls as users_urls
 
@@ -39,7 +39,7 @@ urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('about/', AboutView.as_view(), name='about'),
     path('help/', HelpView.as_view(), name='help'),
-    re_path(r'^model/api/v2/get_predictions/', HardCodedModelOutputAPIView.as_view(), name='model-output'),
+    re_path(r'^model/api/v2/system_configuration/', SystemConfigurationAPIView.as_view(), name='system-config'),
     re_path(r'^model', ProxyToModelAPIView.as_view(), name='model-proxy'),
 
     # Wagtail - Uncomment below to use.

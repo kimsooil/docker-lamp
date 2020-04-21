@@ -11,10 +11,35 @@ from django.conf import settings
 class ProxyToModelAPIView(ProtectedResourceView, APIView):
 
     def get(self, request, format=None):
+        # Convert the Django path to an appropriate flask path
         api_path = request.get_full_path().replace(settings.MODEL_API_SUBPATH, settings.MODEL_API_BASE_URL)
+
+        # Here we are going to get the state that this instance is looking at and always pass this state back to the model api
+        # rather than letting the frontend drive it.
+        # This should be done in a more Django-ish way than just adding to a string, but setting values on the request.GET
+        # QuerySet leads to a lot of immutability issues.
+        if len(request.GET) > 0:
+            api_path += '&state=%s' % settings.MODEL_API_STATE
+        else:
+            api_path += '?state=%s' % settings.MODEL_API_STATE
         r = requests.get(api_path)
         
         return Response(r.json(), status=r.status_code)
+
+
+class SystemConfigurationAPIView(ProtectedResourceView, APIView):
+
+    def get(self, request, format=None):
+        data = {
+            'state': settings.MODEL_API_STATE,
+            'default_counties': settings.API_DEFAULT_COUNTIES,
+            'map_settings': {
+                'center' : [settings.API_DEFAULT_MAP_X_COORD, settings.API_DEFAULT_MAP_Y_COORD],
+                'zoom' : settings.API_DEFAULT_MAP_ZOOM_LEVEL
+            }
+        }
+        
+        return Response(data)
 
 class HardCodedModelOutputAPIView(ProtectedResourceView, APIView):
 
