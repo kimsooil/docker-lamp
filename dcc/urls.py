@@ -39,7 +39,7 @@ urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('about/', AboutView.as_view(), name='about'),
     path('help/', HelpView.as_view(), name='help'),
-    re_path(r'^model/api/v2/system_configuration/', SystemConfigurationAPIView.as_view(), name='system-config'),
+    path('meta/', SystemConfigurationAPIView.as_view(), name='system-meta'),
     re_path(r'^model', ProxyToModelAPIView.as_view(), name='model-proxy'),
 
     # Wagtail - Uncomment below to use.
