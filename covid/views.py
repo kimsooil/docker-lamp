@@ -34,7 +34,10 @@ class SystemConfigurationAPIView(ProtectedResourceView, APIView):
             'state': settings.MODEL_API_STATE,
             'default_counties': settings.API_DEFAULT_COUNTIES,
             'map': {
-                'center' : [settings.API_DEFAULT_MAP_X_COORD, settings.API_DEFAULT_MAP_Y_COORD],
+                'center' : [
+                    float(settings.API_DEFAULT_MAP_X_COORD), 
+                    float(settings.API_DEFAULT_MAP_Y_COORD)
+                ],
                 'zoom' : settings.API_DEFAULT_MAP_ZOOM_LEVEL
             }
         }
