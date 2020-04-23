@@ -1,6 +1,7 @@
 import requests
 
 from oauth2_provider.views.generic import ProtectedResourceView
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.conf import settings
@@ -11,27 +12,31 @@ from django.conf import settings
 class ProxyToModelAPIView(ProtectedResourceView, APIView):
 
     def get(self, request, format=None):
-        # Convert the Django path to an appropriate flask path
-        api_path = request.get_full_path().replace(settings.MODEL_API_SUBPATH, settings.MODEL_API_BASE_URL)
-
-        # Here we are going to get the state that this instance is looking at and always pass this state back to the model api
-        # rather than letting the frontend drive it.
-        # This should be done in a more Django-ish way than just adding to a string, but setting values on the request.GET
-        # QuerySet leads to a lot of immutability issues.
-        if len(request.GET) > 0:
-            api_path += '&state=%s' % settings.MODEL_API_STATE
+        # Validate that if the state is passed in as a query parameter that it is the appropriate state for this instance.
+        if request.GET.get('state') and request.GET['state'] != settings.MODEL_API_STATE:
+            content = {'message': 'The state that you requested is not available.'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
         else:
-            api_path += '?state=%s' % settings.MODEL_API_STATE
-        r = requests.get(api_path)
-        
-        return Response(r.json(), status=r.status_code)
+            # Convert the Django path to an appropriate flask path
+            api_path = request.get_full_path().replace(settings.MODEL_API_SUBPATH, settings.MODEL_API_BASE_URL)
+            r = requests.get(api_path)
+            return Response(r.json(), status=r.status_code)
 
 
 class SystemConfigurationAPIView(ProtectedResourceView, APIView):
 
     def get(self, request, format=None):
         data = {
+            'country': settings.MODEL_API_COUNTRY,
             'state': settings.MODEL_API_STATE,
+            'state_abbreviation': settings.MODEL_API_STATE_ABBREVIATION,
+            'model_defaults': {
+                'counties': settings.API_DEFAULT_COUNTIES,
+                'shelter_date': settings.API_DEFAULT_SHELTER_DATE,
+                'shelter_end_date': settings.API_DEFAULT_SHELTER_END_DATE,
+                'sim_length': settings.API_DEFAULT_SIM_LENGTH,
+                'nDraws': settings.API_DEFAULT_NDRAWS
+            },
             'default_counties': settings.API_DEFAULT_COUNTIES,
             'map': {
                 'center' : [
