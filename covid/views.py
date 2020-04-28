@@ -9,7 +9,7 @@ from django.conf import settings
 # Create your views here.
 
 # Pass Through View to Flask API
-class ProxyToModelAPIView(ProtectedResourceView, APIView):
+class ProxyToModelAPIView(APIView):
 
     def get(self, request, format=None):
         # Validate that if the state is passed in as a query parameter that it is the appropriate state for this instance.
@@ -22,8 +22,39 @@ class ProxyToModelAPIView(ProtectedResourceView, APIView):
             r = requests.get(api_path)
             return Response(r.json(), status=r.status_code)
 
+# Proxy Routes that require authentication.
+class ProtectedProxyToModelAPIView(ProtectedResourceView, APIView):
+    pass
+
 
 class SystemConfigurationAPIView(ProtectedResourceView, APIView):
+
+    def get(self, request, format=None):
+        data = {
+            'country': settings.MODEL_API_COUNTRY,
+            'state': settings.MODEL_API_STATE,
+            'state_abbreviation': settings.MODEL_API_STATE_ABBREVIATION,
+            'model_defaults': {
+                'counties': settings.API_DEFAULT_COUNTIES,
+                'shelter_date': settings.API_DEFAULT_SHELTER_DATE,
+                'shelter_end_date': settings.API_DEFAULT_SHELTER_END_DATE,
+                'sim_length': settings.API_DEFAULT_SIM_LENGTH,
+                'nDraws': settings.API_DEFAULT_NDRAWS
+            },
+            'default_counties': settings.API_DEFAULT_COUNTIES,
+            'map': {
+                'center' : [
+                    float(settings.API_DEFAULT_MAP_X_COORD), 
+                    float(settings.API_DEFAULT_MAP_Y_COORD)
+                ],
+                'zoom' : settings.API_DEFAULT_MAP_ZOOM_LEVEL
+            }
+        }
+        
+        return Response(data)
+
+
+class ModelProgressWebhookAPIView(ProtectedResourceView, APIView):
 
     def get(self, request, format=None):
         data = {
