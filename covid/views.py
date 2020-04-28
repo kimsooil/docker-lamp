@@ -56,7 +56,7 @@ class SystemConfigurationAPIView(ProtectedResourceView, APIView):
         
         return Response(data)
 
-class CountyResourcesAPIView(ListAPIView):
+class CountyResourcesAPIView(ProtectedResourceView, ListAPIView):
     queryset = County.objects.all().order_by('name')
     serializer_class = CountySerializer
 
