@@ -4,7 +4,11 @@ from oauth2_provider.views.generic import ProtectedResourceView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from django.conf import settings
+
+from .models import County
+from .serializers import CountySerializer
 
 # Create your views here.
 
@@ -25,7 +29,6 @@ class ProxyToModelAPIView(APIView):
 # Proxy Routes that require authentication.
 class ProtectedProxyToModelAPIView(ProtectedResourceView, APIView):
     pass
-
 
 class SystemConfigurationAPIView(ProtectedResourceView, APIView):
 
@@ -53,32 +56,9 @@ class SystemConfigurationAPIView(ProtectedResourceView, APIView):
         
         return Response(data)
 
-
-class ModelProgressWebhookAPIView(ProtectedResourceView, APIView):
-
-    def get(self, request, format=None):
-        data = {
-            'country': settings.MODEL_API_COUNTRY,
-            'state': settings.MODEL_API_STATE,
-            'state_abbreviation': settings.MODEL_API_STATE_ABBREVIATION,
-            'model_defaults': {
-                'counties': settings.API_DEFAULT_COUNTIES,
-                'shelter_date': settings.API_DEFAULT_SHELTER_DATE,
-                'shelter_end_date': settings.API_DEFAULT_SHELTER_END_DATE,
-                'sim_length': settings.API_DEFAULT_SIM_LENGTH,
-                'nDraws': settings.API_DEFAULT_NDRAWS
-            },
-            'default_counties': settings.API_DEFAULT_COUNTIES,
-            'map': {
-                'center' : [
-                    float(settings.API_DEFAULT_MAP_X_COORD), 
-                    float(settings.API_DEFAULT_MAP_Y_COORD)
-                ],
-                'zoom' : settings.API_DEFAULT_MAP_ZOOM_LEVEL
-            }
-        }
-        
-        return Response(data)
+class CountyResourcesAPIView(ListAPIView):
+    queryset = County.objects.all().order_by('name')
+    serializer_class = CountySerializer
 
 class HardCodedModelOutputAPIView(ProtectedResourceView, APIView):
 

@@ -28,11 +28,13 @@ from .views import ExampleAuthenticatedView, ExampleView
 from covid.views import ProxyToModelAPIView, ProtectedProxyToModelAPIView, SystemConfigurationAPIView
 
 from users import urls as users_urls
+from covid import urls as covid_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('users/', include(users_urls)),
+    path('covid/', include(covid_urls)),
 
     # re_path(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 
