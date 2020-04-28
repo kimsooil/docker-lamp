@@ -27,7 +27,7 @@ class ProxyToModelAPIView(APIView):
             return Response(r.json(), status=r.status_code)
 
 # Proxy Routes that require authentication.
-class ProtectedProxyToModelAPIView(ProtectedResourceView, APIView):
+class ProtectedProxyToModelAPIView(ProtectedResourceView, ProxyToModelAPIView):
     pass
 
 class SystemConfigurationAPIView(ProtectedResourceView, APIView):
