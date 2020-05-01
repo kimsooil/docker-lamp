@@ -40,7 +40,8 @@ class SystemConfigurationAPIView(ProtectedResourceView, APIView):
             'model_defaults': {
                 'counties': settings.API_DEFAULT_COUNTIES,
                 'shelter_date': settings.API_DEFAULT_SHELTER_DATE,
-                'shelter_end_date': settings.API_DEFAULT_SHELTER_END_DATE,
+                'shelter_release_start_date': settings.API_DEFAULT_SHELTER_RELEASE_START_DATE,
+                'shelter_release_end_date': settings.API_DEFAULT_SHELTER_RELEASE_END_DATE,
                 'sim_length': settings.API_DEFAULT_SIM_LENGTH,
                 'nDraws': settings.API_DEFAULT_NDRAWS
             },
