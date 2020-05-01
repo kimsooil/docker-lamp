@@ -243,8 +243,9 @@ REST_FRAMEWORK = {
 # Email settings.
 EMAIL_BACKEND = ENV('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
 EMAIL_HOST = ENV('DJANGO_EMAIL_HOST', default='localhost')
+EMAIL_HOST_USER = ENV('DJANGO_EMAIL_HOST_USER', default='leprechaun')
 EMAIL_PORT = ENV('DJANGO_EMAIL_PORT', default='25')
-DEFAULT_FROM_EMAIL = 'noreply@gmail.com'
+DEFAULT_FROM_EMAIL = ENV('DJANGO_EMAIL_DEFAULT_FROM_EMAIL', default='noreply@gmail.com')
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
