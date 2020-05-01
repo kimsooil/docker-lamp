@@ -246,6 +246,7 @@ EMAIL_HOST = ENV('DJANGO_EMAIL_HOST', default='localhost')
 EMAIL_HOST_USER = ENV('DJANGO_EMAIL_HOST_USER', default='leprechaun')
 EMAIL_PORT = ENV('DJANGO_EMAIL_PORT', default='25')
 DEFAULT_FROM_EMAIL = ENV('DJANGO_EMAIL_DEFAULT_FROM_EMAIL', default='noreply@gmail.com')
+FORGOT_PASSWORD_VUE_APP_PATH = ENV('DJANGO_FORGOT_PASSWORD_VUE_APP_PATH', default=None)
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/

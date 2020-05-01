@@ -33,6 +33,7 @@ class PasswordResetSerializer(serializers.Serializer):
             'from_email': getattr(settings, 'DEFAULT_FROM_EMAIL'),
             'request': request,
             'email_template_name': 'users/emails/password_reset.html',
+            'extra_email_context': {'vue_frontend_base_path': getattr(settings, 'FORGOT_PASSWORD_VUE_APP_PATH')}
         }
 
         opts.update(self.get_email_options())

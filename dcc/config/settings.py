@@ -11,6 +11,10 @@ from .base import *
 
 ENV = environ.Env()
 
+# Setup support for proxy headers
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 MODEL_API_BASE_URL = ENV('MODEL_API_BASE_URL', default='http://localhost:5000/')
 MODEL_API_SUBPATH = ENV('MODEL_API_SUBPATH', default='/model/')
 MODEL_API_STATE = ENV('MODEL_API_STATE', default='Nebraska')
