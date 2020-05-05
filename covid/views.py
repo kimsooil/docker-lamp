@@ -42,6 +42,9 @@ class SystemConfigurationAPIView(ProtectedResourceView, APIView):
                 'shelter_date': settings.API_DEFAULT_SHELTER_DATE,
                 'shelter_release_start_date': settings.API_DEFAULT_SHELTER_RELEASE_START_DATE,
                 'shelter_release_end_date': settings.API_DEFAULT_SHELTER_RELEASE_END_DATE,
+                'social_distancing': settings.API_DEFAULT_SOCIAL_DISTANCING,
+                'quarantine_percent': settings.API_DEFAULT_QUARANTINE_PERCENT,
+                'high_risk_quarantine_percent': settings.API_DEFAULT_HIGH_RISK_QUARANTINE_PERCENT,
                 'sim_length': settings.API_DEFAULT_SIM_LENGTH,
                 'nDraws': settings.API_DEFAULT_NDRAWS
             },
