@@ -8,7 +8,6 @@ Instructions for using the SEIRcast website.
 3) Enter your login credentials for Identity and Password included in this email and click “Sign In”
     Your username: {}
     Your password: {}
-    If you had already logged on and set a different password, use this one instead. All user account passwords have been reset to support automated user onboarding.
 4) You can now navigate and explore the website.
 
 The menu on the left hand side has options "EPIDEMIC", "RESOURCES" and "MAP",
