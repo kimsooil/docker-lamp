@@ -23,7 +23,7 @@ class Command(BaseCommand):
             password = User.objects.make_random_password()
             try:
                 email = EmailMessage(
-                    subject='Subject here',
+                    subject='Welcome to SEIRcast - Account Information',
                     body=generate_email_body(username, password),
                     to=[user.email],
                     cc=['Edwin Michael <emichael@nd.edu>'],
