@@ -11,10 +11,13 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--emails', nargs='*', type=str)
+        parser.add_argument('--force', action='store_true', help='Forces sending of emails even if one has already been sent.',)
 
     def handle(self, *args, **options):
         if options['emails']:
-            users = User.objects.filter(email__in=options['emails'],onboarding_email_sent=False)
+            users = User.objects.filter(email__in=options['emails'])
+            if not options['force']:
+                users = users.filter(onboarding_email_sent=False)
         else:
             users = User.objects.filter(onboarding_email_sent=False).exclude(email=None) # , username__contains="@"
         for user in users:
@@ -31,6 +34,7 @@ class Command(BaseCommand):
                 )
                 email.send(fail_silently=False)
                 user.onboarding_email_sent = True
+                user.set_password(password)
                 user.save()
                 self.stdout.write(self.style.SUCCESS('Email sent sucessfully to {}'.format(user.email)))
             except:
