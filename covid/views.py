@@ -30,7 +30,7 @@ class ProxyToModelAPIView(APIView):
 class ProtectedProxyToModelAPIView(ProtectedResourceView, ProxyToModelAPIView):
     pass
 
-class SystemConfigurationAPIView(ProtectedResourceView, APIView):
+class SystemConfigurationAPIView(APIView):
 
     def get(self, request, format=None):
         data = {
@@ -62,7 +62,7 @@ class SystemConfigurationAPIView(ProtectedResourceView, APIView):
         
         return Response(data)
 
-class CountyResourcesAPIView(ProtectedResourceView, ListAPIView):
+class CountyResourcesAPIView(ListAPIView):
     queryset = County.objects.all().order_by('name')
     serializer_class = CountySerializer
 

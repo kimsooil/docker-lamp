@@ -42,8 +42,8 @@ urlpatterns = [
     path('about/', AboutView.as_view(), name='about'),
     path('help/', HelpView.as_view(), name='help'),
     path('meta/', SystemConfigurationAPIView.as_view(), name='system-meta'),
-    re_path(r'^model/api/v3/prediction_status/', ProxyToModelAPIView.as_view(), name='model-proxy'),
-    re_path(r'^model', ProtectedProxyToModelAPIView.as_view(), name='model-proxy'),
+    re_path(r'^model/api/v3/prediction/', ProtectedProxyToModelAPIView.as_view(), name='model-prediction-proxy'),
+    re_path(r'^model', ProxyToModelAPIView.as_view(), name='model-proxy'),
 
     # Wagtail - Uncomment below to use.
     # re_path(r'^cms/', include(wagtailadmin_urls)),
