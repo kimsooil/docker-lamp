@@ -6,8 +6,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from django.conf import settings
+from django.forms.models import model_to_dict
 
-from .models import County
+from .models import County, State
 from .serializers import CountySerializer
 
 # Create your views here.
@@ -16,15 +17,10 @@ from .serializers import CountySerializer
 class ProxyToModelAPIView(APIView):
 
     def get(self, request, format=None):
-        # Validate that if the state is passed in as a query parameter that it is the appropriate state for this instance.
-        if request.GET.get('state') and request.GET['state'] != settings.MODEL_API_STATE:
-            content = {'message': 'The state that you requested is not available.'}
-            return Response(content, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            # Convert the Django path to an appropriate flask path
-            api_path = request.get_full_path().replace(settings.MODEL_API_SUBPATH, settings.MODEL_API_BASE_URL)
-            r = requests.get(api_path)
-            return Response(r.json(), status=r.status_code)
+        # Convert the Django path to an appropriate flask path
+        api_path = request.get_full_path().replace(settings.MODEL_API_SUBPATH, settings.MODEL_API_BASE_URL)
+        r = requests.get(api_path)
+        return Response(r.json(), status=r.status_code)
 
 # Proxy Routes that require authentication.
 class ProtectedProxyToModelAPIView(ProtectedResourceView, ProxyToModelAPIView):
@@ -57,14 +53,18 @@ class SystemConfigurationAPIView(APIView):
                     float(settings.API_DEFAULT_MAP_Y_COORD)
                 ],
                 'zoom' : settings.API_DEFAULT_MAP_ZOOM_LEVEL
-            }
+            },
+            'default_state': settings.API_DEFAULT_STATE,
+            'states': [model_to_dict(state, fields=[field.name for field in state._meta.fields], exclude=['id']) for state in State.objects.all().order_by('name')]
         }
         
         return Response(data)
 
+
 class CountyResourcesAPIView(ListAPIView):
     queryset = County.objects.all().order_by('name')
     serializer_class = CountySerializer
+
 
 class HardCodedModelOutputAPIView(ProtectedResourceView, APIView):
 
