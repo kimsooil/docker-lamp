@@ -1,5 +1,9 @@
 from django.urls import path, include
-from .views import CountyResourcesAPIView
+from rest_framework import routers
+from .views import CountyResourcesAPIView, SimulationRunViewSet
+
+router = routers.SimpleRouter()
+router.register(r'api/simulations',SimulationRunViewSet )
 
 urlpatterns = [
     # Return all county resources
@@ -9,3 +13,5 @@ urlpatterns = [
         name="county_resources"
     ),
 ]
+
+urlpatterns += router.urls

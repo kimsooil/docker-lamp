@@ -1,6 +1,10 @@
+import uuid
+
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import get_user_model
 
 
 class State(models.Model):
@@ -46,3 +50,21 @@ class County(models.Model):
 
     def get_absolute_url(self):
         return reverse("County_detail", kwargs={"pk": self.pk})
+
+
+class SimulationRun(models.Model):
+    user = models.ForeignKey(get_user_model(), verbose_name=_("User"), on_delete=models.CASCADE)
+    model_input = JSONField(null=True, blank=True)
+    model_output = JSONField(null=True, blank=True)
+    timestamp = models.DateTimeField(_("Timestamp"), auto_now=False, auto_now_add=True)
+    webhook_token = models.UUIDField(_("Webhook Token"), default=uuid.uuid4, editable=False)
+    
+    class Meta:
+        verbose_name = _("Simulation Run")
+        verbose_name_plural = _("Simulation Runs")
+
+    def __str__(self):
+        return "{} - {}".format(self.user, self.timestamp)
+
+    def get_absolute_url(self):
+        return reverse("SimulationRun_detail", kwargs={"pk": self.pk})
