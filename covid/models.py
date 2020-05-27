@@ -15,11 +15,15 @@ class State(models.Model):
     default_counties = ArrayField(models.CharField(_("County Name"), max_length=80), size=8,
                                   help_text=_("Default Counties"))
     shelter_date = models.DateField(_("Shelter Date"))
-    shelter_release_start_date = models.DateField(_("Shelter Release Start Date"))
+    shelter_release_start_date = models.DateField(
+        _("Shelter Release Start Date"))
     shelter_release_end_date = models.DateField(_("Shelter Release End Date"))
-    social_distancing = models.BooleanField(_("Social Distancing"), default=True)
-    social_distancing_end_date = models.DateField(_("Social Distancing End Date"))
-    quarantine_percent = models.PositiveSmallIntegerField(_("Percentage Quarantined"), default=0)
+    social_distancing = models.BooleanField(
+        _("Social Distancing"), default=True)
+    social_distancing_end_date = models.DateField(
+        _("Social Distancing End Date"))
+    quarantine_percent = models.PositiveSmallIntegerField(
+        _("Percentage Quarantined"), default=0)
     quarantine_start_date = models.DateField(_("Quarantine Start Date"))
 
     class Meta:
@@ -36,10 +40,14 @@ class State(models.Model):
 # Create your models here.
 class County(models.Model):
     name = models.CharField(_("County Name"), max_length=80)
-    state = models.ForeignKey("State", verbose_name=_("State"), on_delete=models.CASCADE)
-    hospital_bed_capacity = models.IntegerField(_("Hospital Bed Capacity"), blank=True, null=True)
-    icu_bed_capacity = models.IntegerField(_("ICU Bed Capacity"), blank=True, null=True)
-    ventilator_capacity = models.IntegerField(_("Ventilator Capacity"), blank=True, null=True)
+    state = models.ForeignKey("State", verbose_name=_(
+        "State"), on_delete=models.CASCADE)
+    hospital_bed_capacity = models.IntegerField(
+        _("Hospital Bed Capacity"), blank=True, null=True)
+    icu_bed_capacity = models.IntegerField(
+        _("ICU Bed Capacity"), blank=True, null=True)
+    ventilator_capacity = models.IntegerField(
+        _("Ventilator Capacity"), blank=True, null=True)
 
     class Meta:
         verbose_name = _("County")
@@ -53,12 +61,15 @@ class County(models.Model):
 
 
 class SimulationRun(models.Model):
-    user = models.ForeignKey(get_user_model(), verbose_name=_("User"), on_delete=models.CASCADE)
+    user = models.ForeignKey(get_user_model(), verbose_name=_(
+        "User"), on_delete=models.CASCADE)
     model_input = JSONField(null=True, blank=True)
     model_output = JSONField(null=True, blank=True)
-    timestamp = models.DateTimeField(_("Timestamp"), auto_now=False, auto_now_add=True)
-    webhook_token = models.UUIDField(_("Webhook Token"), default=uuid.uuid4, editable=False)
-    
+    timestamp = models.DateTimeField(
+        _("Timestamp"), auto_now=False, auto_now_add=True)
+    webhook_token = models.UUIDField(
+        _("Webhook Token"), default=uuid.uuid4, editable=False)
+
     class Meta:
         verbose_name = _("Simulation Run")
         verbose_name_plural = _("Simulation Runs")

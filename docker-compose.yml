@@ -1,14 +1,12 @@
 # https://cookiecutter-django.readthedocs.io/en/latest/developing-locally-docker.html#
 # Local development of Django.
-
 version: '3'
-
 # 3 name volumes are named here.
 volumes:
     volume_postgresdata:        # Store the postgres database data. Only linked with postgres.
     volume_django_media:        # Store the Django media files. Volume is shared between djangoweb and nginx.
     volume_django_static:       # Store the Django static files. Volume is shared between djangoweb and nginx.
-
+    volume_model:
 services:
     # Test send/receive email. 
     mailhog:
@@ -18,7 +16,6 @@ services:
             - "127.0.0.1:8025:8025"
         networks:
             - frontend
-
     # Postgresql database settings.
     postgresdb:
         image: postgres:9.6-alpine
@@ -33,7 +30,6 @@ services:
             - "127.0.0.1:5432:5432"
         networks:
             - backend
-
     # Django settings.
     djangoweb:
         build:
@@ -71,9 +67,21 @@ services:
             - ADMIN_EMAIL
             - ADMIN_PASSWORD
             - ADMIN_RESET
+            - MODEL_API_BASE_URL
+            - AWS_SECRET_ACCESS_KEY_ID
+            - AWS_ACCESS_KEY_ID
+            - AWS_STORAGE_BUCKET_NAME
+            - AWS_REGION_NAME
         links:
             - "postgresdb"
-
+    model:
+        image: threaded-model
+        restart: unless-stopped
+        networks:
+            - backend
+            - frontend
+        volumes:
+            - volume_model
 networks:
     frontend:
     backend:

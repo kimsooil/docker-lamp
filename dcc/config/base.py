@@ -21,7 +21,8 @@ ENV = environ.Env()
 
 # Use this if dcc/settings/development.py
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BASE_DIR = os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -37,7 +38,8 @@ with open(os.path.join(BASE_DIR, 'secretkey.txt')) as f:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if ENV('DJANGO_ENVIRONMENT') == 'production' else True
 
-ALLOWED_HOSTS = ENV.list('DJANGO_ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
+ALLOWED_HOSTS = ENV.list('DJANGO_ALLOWED_HOSTS', default=[
+                         'localhost', '127.0.0.1'])
 
 # Sets the 'prefix' of ALL django paths. DO NOT INCLUDE THIS IN YOUR URLS.
 FORCE_SCRIPT_NAME = ENV('FORCE_SCRIPT_NAME', default=None)
@@ -241,12 +243,15 @@ REST_FRAMEWORK = {
 }
 
 # Email settings.
-EMAIL_BACKEND = ENV('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+EMAIL_BACKEND = ENV('DJANGO_EMAIL_BACKEND',
+                    default='django.core.mail.backends.console.EmailBackend')
 EMAIL_HOST = ENV('DJANGO_EMAIL_HOST', default='localhost')
 EMAIL_HOST_USER = ENV('DJANGO_EMAIL_HOST_USER', default='leprechaun')
 EMAIL_PORT = ENV('DJANGO_EMAIL_PORT', default='25')
-DEFAULT_FROM_EMAIL = ENV('DJANGO_EMAIL_DEFAULT_FROM_EMAIL', default='noreply@gmail.com')
-FORGOT_PASSWORD_VUE_APP_PATH = ENV('DJANGO_FORGOT_PASSWORD_VUE_APP_PATH', default=None)
+DEFAULT_FROM_EMAIL = ENV(
+    'DJANGO_EMAIL_DEFAULT_FROM_EMAIL', default='noreply@gmail.com')
+FORGOT_PASSWORD_VUE_APP_PATH = ENV(
+    'DJANGO_FORGOT_PASSWORD_VUE_APP_PATH', default=None)
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
@@ -274,5 +279,6 @@ STATIC_URL = '/static/'
 # ]
 STATIC_ROOT = '/var/staticfiles/'
 
-MEDIA_ROOT = '/var/mediafiles/' if ENV('DJANGO_ENVIRONMENT') == 'production' else os.path.join(BASE_DIR, 'media/')
+MEDIA_ROOT = '/var/mediafiles/' if ENV(
+    'DJANGO_ENVIRONMENT') == 'production' else os.path.join(BASE_DIR, 'media/')
 MEDIA_URL = '/media/'
