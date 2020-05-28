@@ -63,7 +63,7 @@ class County(models.Model):
 class SimulationRun(models.Model):
     user = models.ForeignKey(get_user_model(), verbose_name=_(
         "User"), on_delete=models.CASCADE)
-    model_input = JSONField(null=True, blank=True)
+    model_input = JSONField(null=True, blank=True, unique=True  )
     model_output = JSONField(null=True, blank=True)
     timestamp = models.DateTimeField(
         _("Timestamp"), auto_now=False, auto_now_add=True)
