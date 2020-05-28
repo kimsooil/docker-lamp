@@ -83,4 +83,4 @@ steps:
       registry: zazu.crc.nd.edu
       auto_tag: true
       build_args:
-        - ENVIRONMENT=production
+        - DJANGO_ENVIRONMENT=production
