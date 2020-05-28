@@ -117,28 +117,34 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         serializer = SimulationRunSerializer(
             data=request.data)
-        serializer.is_valid(raise_exception=True)
-        sim_run_id = self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        # s3_data = str(json.dumps(serializer.data))
-        webhook_url = request.build_absolute_uri()
-        webhook_url += str(sim_run_id) + '/webhook/'
-        webhook_dict = {'webhook_url': webhook_url}
-        s3_serializer_url = webhook_dict
-        s3_serializer_url.update(serializer.data)
-        s3_data = str(json.dumps(s3_serializer_url))
-        key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
-        # put in s3
-        response = s3_client.put_object(
-            Body=s3_data,
-            Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-            Key=key_name
-        )
+        try:
+            # Try to find an existing run with the same params. Return existing run instead of recomputing.
+            existing_run_results = SimulationRun.objects.get(model_input=request.data['model_input'])
+            serializer = self.get_serializer(existing_run_results)
+            return Response(serializer.data)
+        except:
+            serializer.is_valid(raise_exception=True)
+            sim_run_id = self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            # s3_data = str(json.dumps(serializer.data))
+            webhook_url = request.build_absolute_uri()
+            webhook_url += str(sim_run_id) + '/webhook/'
+            webhook_dict = {'webhook_url': webhook_url}
+            s3_serializer_url = webhook_dict
+            s3_serializer_url.update(serializer.data)
+            s3_data = str(json.dumps(s3_serializer_url))
+            key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
+            # put in s3
+            response = s3_client.put_object(
+                Body=s3_data,
+                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                Key=key_name
+            )
 
-        s3_serializer_url = webhook_dict
-        s3_serializer_url.update(serializer.data)
-        s3_serializer_url.update(response)
-        return Response(s3_serializer_url, headers=headers)
+            s3_serializer_url = webhook_dict
+            s3_serializer_url.update(serializer.data)
+            s3_serializer_url.update(response)
+            return Response(s3_serializer_url, headers=headers)
 
     def perform_create(self, serializer):
         # put user in
