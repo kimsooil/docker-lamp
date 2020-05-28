@@ -3,7 +3,7 @@ def generate_email_body(username, password):
 
 Instructions for using the SEIRcast website.
 
-1) Navigate to the website as https://covid.crc.nd.edu/
+1) Navigate to the website as https://seircast.org/
 2) Select either "Login to Portal", "Epidemic Tracking", "Hospital Resources", or "COVID-19 Case Map" and you will be presented with the sign in screen
 3) Enter your login credentials for Identity and Password included in this email and click “Sign In”
     Your username: {}
