@@ -103,7 +103,7 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
     queryset = SimulationRun.objects.all()
     serializer_class = SimulationRunSerializer
     webhook_url = serializers.CharField(max_length=100)
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     @action(methods=['put'], detail=True, permission_classes=[AllowAny],
             url_path='webhook', url_name='webhook')
@@ -142,8 +142,7 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         # put user in
-        user_id = self.request.GET.get('user_id', 1)
-        user = User.objects.get(id=user_id)
+        user = self.request.user
 
         obj = serializer.save(user=user)
         return obj.id
