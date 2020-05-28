@@ -3,6 +3,7 @@ import json
 
 from oauth2_provider.views.generic import ProtectedResourceView
 from rest_framework import status, viewsets
+from rest_framework.reverse import reverse
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -16,7 +17,6 @@ from .serializers import CountySerializer, SimulationRunSerializer
 
 from django.contrib.auth import get_user_model
 from django.db import models
-from django.urls import reverse
 # from urls import urlpatterns
 import boto3
 import time
@@ -125,10 +125,8 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         except:
             serializer.is_valid(raise_exception=True)
             sim_run_id = self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
             # s3_data = str(json.dumps(serializer.data))
-            webhook_url = request.build_absolute_uri()
-            webhook_url += str(sim_run_id) + '/webhook/'
+            webhook_url = reverse('simulations-webhook', args=[sim_run_id], request=request)
             webhook_dict = {'webhook_url': webhook_url}
             s3_serializer_url = webhook_dict
             s3_serializer_url.update(serializer.data)
@@ -141,10 +139,9 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
                 Key=key_name
             )
 
-            s3_serializer_url = webhook_dict
-            s3_serializer_url.update(serializer.data)
-            s3_serializer_url.update(response)
-            return Response(s3_serializer_url, headers=headers)
+            
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_create(self, serializer):
         # put user in

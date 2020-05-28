@@ -3,7 +3,7 @@ from rest_framework import routers
 from .views import CountyResourcesAPIView, SimulationRunViewSet
 
 router = routers.SimpleRouter()
-router.register(r'api/simulations',SimulationRunViewSet )
+router.register(r'api/simulations',SimulationRunViewSet, basename="simulations" )
 
 urlpatterns = [
     # Return all county resources

@@ -12,5 +12,5 @@ class CountySerializer(serializers.ModelSerializer):
 class SimulationRunSerializer(serializers.ModelSerializer):
     class Meta:
         model = SimulationRun
-        fields = ['timestamp', 'model_input',
-                  'model_output', 'webhook_token']
+        fields = ['id', 'timestamp', 'model_input',
+                  'model_output', ]
