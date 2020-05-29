@@ -109,26 +109,41 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             url_path='webhook', url_name='webhook')
     def handle_webhook(self, request, pk=None):
         sim_run = self.get_object()
-        sim_run.model_output = request.data
-        sim_run.save()
+        # validate webhook
+        if str(sim_run.webhook_token) == request.data['webhook_token']:
+            # ensure model is not complete
+            if not bool(sim_run.model_output) or sim_run.model_output['status'] != 'complete':
+                sim_run.model_output = request.data
+                sim_run.save()
+                return Response({'status': 'progress updated'})
+            else:
+                return Response({'status': 'model completed'}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'status': 'progress updated'})
+        else:
+            return Response({'status': 'invalid webhook token'}, status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
         serializer = SimulationRunSerializer(
             data=request.data)
+
         try:
             # Try to find an existing run with the same params. Return existing run instead of recomputing.
-            existing_run_results = SimulationRun.objects.get(model_input=request.data['model_input'])
+            existing_run_results = SimulationRun.objects.get(
+                model_input=request.data['model_input'])
             serializer = self.get_serializer(existing_run_results)
             return Response(serializer.data)
         except:
             serializer.is_valid(raise_exception=True)
-            sim_run_id = self.perform_create(serializer)
+            sim_run = self.perform_create(serializer)
+            sim_run_id = sim_run.id
+            webhook_token = sim_run.webhook_token
+            webhook_token_dict = {'webhook_token': str(webhook_token)}
             # s3_data = str(json.dumps(serializer.data))
-            webhook_url = reverse('simulations-webhook', args=[sim_run_id], request=request)
+            webhook_url = reverse('simulations-webhook',
+                                  args=[sim_run_id], request=request)
             webhook_dict = {'webhook_url': webhook_url}
             s3_serializer_url = webhook_dict
+            s3_serializer_url.update(webhook_token_dict)
             s3_serializer_url.update(serializer.data)
             s3_data = str(json.dumps(s3_serializer_url))
             key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
@@ -139,7 +154,6 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
                 Key=key_name
             )
 
-            
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -148,4 +162,5 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         user = self.request.user
 
         obj = serializer.save(user=user)
-        return obj.id
+        # Response(obj)
+        return obj
