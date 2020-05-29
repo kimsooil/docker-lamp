@@ -112,7 +112,9 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         # validate webhook
         if str(sim_run.webhook_token) == request.data['webhook_token']:
             # ensure model is not complete
-            if sim_run.model_output != None and sim_run.model_output.get('status', None) == 'complete':
+            if not request.data.get('output'):
+                return Response({'status': "webhook payload must contain an 'output' key."}, status=status.HTTP_400_BAD_REQUEST)
+            elif sim_run.model_output != None and sim_run.model_output.get('status', None) == 'complete':
                 return Response({'status': 'model completed'}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 sim_run.model_output = request.data['output']
