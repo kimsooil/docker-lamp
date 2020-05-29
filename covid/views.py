@@ -114,7 +114,7 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             # ensure model is not complete
             if not request.data.get('output'):
                 return Response({'status': "webhook payload must contain an 'output' key."}, status=status.HTTP_400_BAD_REQUEST)
-            elif sim_run.model_output != None and sim_run.model_output.get('status', None) == 'complete':
+            elif sim_run.model_output != None and type(sim_run.model_output) is dict and sim_run.model_output.get('status', None) == 'complete':
                 return Response({'status': 'model completed'}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 sim_run.model_output = request.data['output']
