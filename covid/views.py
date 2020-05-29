@@ -112,12 +112,15 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         # validate webhook
         if str(sim_run.webhook_token) == request.data['webhook_token']:
             # ensure model is not complete
-            if not bool(sim_run.model_output) or sim_run.model_output['status'] != 'complete':
-                sim_run.model_output = request.data
-                sim_run.save()
-                return Response({'status': 'progress updated'})
-            else:
+            if sim_run.model_output != None and sim_run.model_output.get('status', None) == 'complete':
                 return Response({'status': 'model completed'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                sim_run.model_output = request.data['output']
+                sim_run.save()
+                serializer = self.get_serializer(sim_run)
+                headers = self.get_success_headers(serializer.data)
+                # Return the actual object with updated values
+                return Response(serializer.data, headers=headers)
 
         else:
             return Response({'status': 'invalid webhook token'}, status=status.HTTP_400_BAD_REQUEST)
