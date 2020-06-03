@@ -150,8 +150,8 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             s3_serializer_url = webhook_dict
             s3_serializer_url.update(webhook_token_dict)
             s3_serializer_url.update(serializer.data)
-            s3_serializer_url.update(
-                {'data_hash': '43a9ba9555a28e002e50f042540bb3740fbaab6d'})
+            # s3_serializer_url.update(
+            #     {'data_hash': '43a9ba9555a28e002e50f042540bb3740fbaab6d'})
             s3_data = str(json.dumps(s3_serializer_url))
             key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
             # put in s3
