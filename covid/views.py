@@ -12,8 +12,8 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from django.conf import settings
 from django.forms.models import model_to_dict
 
-from .models import County, State, SimulationRun
-from .serializers import CountySerializer, SimulationRunSerializer
+from .models import County, State, SimulationRun, HashValue
+from .serializers import CountySerializer, SimulationRunSerializer, HashValueSerializer
 
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -150,6 +150,8 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             s3_serializer_url = webhook_dict
             s3_serializer_url.update(webhook_token_dict)
             s3_serializer_url.update(serializer.data)
+            s3_serializer_url.update(
+                {'data_hash': '43a9ba9555a28e002e50f042540bb3740fbaab6d'})
             s3_data = str(json.dumps(s3_serializer_url))
             key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
             # put in s3
@@ -169,3 +171,25 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         obj = serializer.save(user=user)
         # Response(obj)
         return obj
+
+
+class HashResourceAPIView(APIView):
+
+    def get(self, request, format=None):
+        queryset = HashValue.objects.all().order_by('id')
+        # for hash in queryset:
+        #     hash_value = hash.hash_value
+        #     timestamp = hash.timestamp
+        #     temp = {'hash': hash_value, 'timestamp': timestamp}
+        serializer = HashValueSerializer(queryset, many=True)
+        return Response(serializer.data)
+        # hash_time = {}
+        # for hash in Has
+        # serializer_class = CountySerializer
+
+    def post(self, request, format=None):
+        serializer = HashValueSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import County, SimulationRun
+from .models import County, SimulationRun, HashValue
 
 
 class CountySerializer(serializers.ModelSerializer):
@@ -14,3 +14,9 @@ class SimulationRunSerializer(serializers.ModelSerializer):
         model = SimulationRun
         fields = ['id', 'timestamp', 'model_input',
                   'model_output', ]
+
+
+class HashValueSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HashValue
+        fields = ['id', 'timestamp', 'hash_value', ]

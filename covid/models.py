@@ -63,7 +63,7 @@ class County(models.Model):
 class SimulationRun(models.Model):
     user = models.ForeignKey(get_user_model(), verbose_name=_(
         "User"), on_delete=models.CASCADE)
-    model_input = JSONField(null=True, blank=True, unique=True  )
+    model_input = JSONField(null=True, blank=True, unique=True)
     model_output = JSONField(null=True, blank=True)
     timestamp = models.DateTimeField(
         _("Timestamp"), auto_now=False, auto_now_add=True)
@@ -79,3 +79,25 @@ class SimulationRun(models.Model):
 
     def get_absolute_url(self):
         return reverse("SimulationRun_detail", kwargs={"pk": self.pk})
+
+
+class HashValue(models.Model):
+    hash_value = models.CharField(max_length=40, unique=True,
+                                  null=False, blank=False)
+    timestamp = models.DateTimeField(
+        _("Timestamp"), auto_now=False, auto_now_add=False)
+
+    class Meta:
+        verbose_name = _("Hash Value")
+        verbose_name_plural = _("Hash Values")
+
+    def __str__(self):
+        return "{} - {}".format(self.hash, self.timestamp)
+
+    def get_absolute_url(self):
+        return reverse("HashValues_detail", kwargs={"pk": self.pk})
+
+    @classmethod
+    def create(cls, hash, time):
+        new_hash = cls(hash_value=hash, timestamp=time)
+        return new_hash
