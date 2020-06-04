@@ -60,10 +60,8 @@ class Command(BaseCommand):
             self.stdout.write("deleted all hashes")
         else:
             confirmed_filename = 'time_series_covid19_confirmed_US.csv'
+            # dont beleive this is necessary anymore
             try:
-                # current_time = float(datetime.datetime.utcfromtimestamp(
-                #     os.path.getmtime(base_folder + confirmed_filename)).strftime("%s"))
-                # HashValue.objects.all().order_by('timestamp')[0]
                 current_time = float(datetime.datetime.utcfromtimestamp(
                     HashValue.objects.all().order_by('timestamp')[0]).strftime("%s"))
             except:
@@ -126,13 +124,13 @@ class Command(BaseCommand):
                                         # add data_point['sha'] to database with timestamp
                                         # if hash not currently in
                                         self.stdout.write(
-                                            "Adding Hash: "+data_point['sha'] + " with time: "+str(commmit_date))
+                                            "Adding Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'])
 
                                         try:
                                             new_hash = HashValue.create(data_point['sha'],
                                                                         data_point['commit']['committer']['date'])
                                             self.stdout.write(
-                                                "Created Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'] + " to database.")
+                                                "Created Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'])
                                             new_hash.save()
                                             self.stdout.write(
                                                 "Saved Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'] + " to database.")
