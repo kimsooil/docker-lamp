@@ -128,17 +128,27 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             return Response({'status': 'invalid webhook token'}, status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
+        latest_hash = HashValue.objects.all().order_by(
+            '-timestamp')[0].hash_value
+        model_input_dict = request.data
+        model_input_dict['model_input'].update({'data_hash': latest_hash})
         serializer = SimulationRunSerializer(
-            data=request.data)
+            data=model_input_dict)
 
         try:
             # Try to find an existing run with the same params. Return existing run instead of recomputing.
+            # model_input_dict = request.data['model_input']
+            # model_input_dict.update({'data_hash': latest_hash})
             existing_run_results = SimulationRun.objects.get(
-                model_input=request.data['model_input'])
+                model_input=model_input_dict['model_input'])
+            print('check 1')
             serializer = self.get_serializer(existing_run_results)
+            print('check 2')
             return Response(serializer.data)
         except:
+            print('check 3')
             serializer.is_valid(raise_exception=True)
+            print('check 4')
             sim_run = self.perform_create(serializer)
             sim_run_id = sim_run.id
             webhook_token = sim_run.webhook_token

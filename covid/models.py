@@ -92,7 +92,7 @@ class HashValue(models.Model):
         verbose_name_plural = _("Hash Values")
 
     def __str__(self):
-        return "{} - {}".format(self.hash, self.timestamp)
+        return "{} - {}".format(self.hash_value, self.timestamp)
 
     def get_absolute_url(self):
         return reverse("HashValues_detail", kwargs={"pk": self.pk})
