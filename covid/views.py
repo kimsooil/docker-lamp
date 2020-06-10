@@ -22,6 +22,7 @@ from django.db import models
 import boto3
 import time
 from rest_framework import serializers
+from .model_runners import ModelRunner
 s3_client = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                          aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY_ID)
 
@@ -144,30 +145,33 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         except:
             serializer.is_valid(raise_exception=True)
             sim_run = self.perform_create(serializer)
-            sim_run_id = sim_run.id
-            webhook_token = sim_run.webhook_token
-            webhook_token_dict = {'webhook_token': str(webhook_token)}
-            webhook_url = reverse('simulations-webhook',
-                                  args=[sim_run_id], request=request)
-            webhook_dict = {'webhook_url': webhook_url}
-            s3_dict = webhook_dict
-            # check user group for spot fargate launch
-            user = User.objects.get(id=request.user.id)
-            if user.groups.filter(name='Fargate Spot').exists():
-                s3_dict.update({'capacity_provider': 'FARGATE_SPOT'})
-            else:
-                s3_dict.update({'capacity_provider': 'FARGATE'})
-            s3_dict.update(webhook_token_dict)
-            s3_dict.update(serializer.data)
-            print(s3_dict)
-            s3_data = str(json.dumps(s3_dict))
-            key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
-            # put in s3
-            response = s3_client.put_object(
-                Body=s3_data,
-                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-                Key=key_name
-            )
+            model_run = ModelRunner(serializer.data, sim_run, request)
+            model_run.submitJob()
+            # THIS HAS ALL BEEN REPLACED WITH MODELRUNNER
+            # sim_run_id = sim_run.id
+            # webhook_token = sim_run.webhook_token
+            # webhook_token_dict = {'webhook_token': str(webhook_token)}
+            # webhook_url = reverse('simulations-webhook',
+            #                       args=[sim_run_id], request=request)
+            # webhook_dict = {'webhook_url': webhook_url}
+            # s3_dict = webhook_dict
+            # # check user group for spot fargate launch
+            # user = User.objects.get(id=request.user.id)
+            # if user.groups.filter(name='Fargate Spot').exists():
+            #     s3_dict.update({'capacity_provider': 'FARGATE_SPOT'})
+            # else:
+            #     s3_dict.update({'capacity_provider': 'FARGATE'})
+            # s3_dict.update(webhook_token_dict)
+            # s3_dict.update(serializer.data)
+            # print(s3_dict)
+            # s3_data = str(json.dumps(s3_dict))
+            # key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
+            # # put in s3
+            # response = s3_client.put_object(
+            #     Body=s3_data,
+            #     Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+            #     Key=key_name
+            # )
 
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
