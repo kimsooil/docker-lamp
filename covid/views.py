@@ -15,6 +15,7 @@ from django.forms.models import model_to_dict
 from .models import County, State, SimulationRun, HashValue
 from .serializers import CountySerializer, SimulationRunSerializer, HashValueSerializer
 
+
 from django.contrib.auth import get_user_model
 from django.db import models
 # from urls import urlpatterns
@@ -136,33 +137,30 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             data=model_input_dict)
 
         try:
-            # Try to find an existing run with the same params. Return existing run instead of recomputing.
-            # model_input_dict = request.data['model_input']
-            # model_input_dict.update({'data_hash': latest_hash})
             existing_run_results = SimulationRun.objects.get(
                 model_input=model_input_dict['model_input'])
-            print('check 1')
             serializer = self.get_serializer(existing_run_results)
-            print('check 2')
             return Response(serializer.data)
         except:
-            print('check 3')
             serializer.is_valid(raise_exception=True)
-            print('check 4')
             sim_run = self.perform_create(serializer)
             sim_run_id = sim_run.id
             webhook_token = sim_run.webhook_token
             webhook_token_dict = {'webhook_token': str(webhook_token)}
-            # s3_data = str(json.dumps(serializer.data))
             webhook_url = reverse('simulations-webhook',
                                   args=[sim_run_id], request=request)
             webhook_dict = {'webhook_url': webhook_url}
-            s3_serializer_url = webhook_dict
-            s3_serializer_url.update(webhook_token_dict)
-            s3_serializer_url.update(serializer.data)
-            # s3_serializer_url.update(
-            #     {'data_hash': '43a9ba9555a28e002e50f042540bb3740fbaab6d'})
-            s3_data = str(json.dumps(s3_serializer_url))
+            s3_dict = webhook_dict
+            # check user group for spot fargate launch
+            user = User.objects.get(id=request.user.id)
+            if user.groups.filter(name='Fargate Spot').exists():
+                s3_dict.update({'capacity_provider': 'FARGATE_SPOT'})
+            else:
+                s3_dict.update({'capacity_provider': 'FARGATE'})
+            s3_dict.update(webhook_token_dict)
+            s3_dict.update(serializer.data)
+            print(s3_dict)
+            s3_data = str(json.dumps(s3_dict))
             key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
             # put in s3
             response = s3_client.put_object(
@@ -187,15 +185,8 @@ class HashResourceAPIView(APIView):
 
     def get(self, request, format=None):
         queryset = HashValue.objects.all().order_by('id')
-        # for hash in queryset:
-        #     hash_value = hash.hash_value
-        #     timestamp = hash.timestamp
-        #     temp = {'hash': hash_value, 'timestamp': timestamp}
         serializer = HashValueSerializer(queryset, many=True)
         return Response(serializer.data)
-        # hash_time = {}
-        # for hash in Has
-        # serializer_class = CountySerializer
 
     def post(self, request, format=None):
         serializer = HashValueSerializer(data=request.data)
