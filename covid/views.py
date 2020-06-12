@@ -22,7 +22,7 @@ from django.db import models
 import boto3
 import time
 from rest_framework import serializers
-from .model_runners import ModelRunner
+from .model_runners import ModelRunner, OnboardCompute
 s3_client = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                          aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY_ID)
 
@@ -134,19 +134,40 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             '-timestamp')[0].hash_value
         model_input_dict = request.data
         model_input_dict['model_input'].update({'data_hash': latest_hash})
+        # user_cp = User.objects.get(id=user.id)
+        # if user_cp.groups.filter(name='Fargate').exists():
+        #     model_input_dict.update({'capacity_provider': 'FARGATE'})
+        # elif user.groups.filter(name='Fargate Spot').exists():
+        #     model_input_dict.update({'capacity_provider': 'FARGATE_SPOT'})
+        # elif user.groups.filter(name='Onboard Compute').exists():
+        #     model_input_dict.update({'capacity_provider': 'onboard'})
+        # else:
+        #     model_input_dict.update({'capacity_provider': 'onboard'})
         serializer = SimulationRunSerializer(
             data=model_input_dict)
-
         try:
             existing_run_results = SimulationRun.objects.get(
                 model_input=model_input_dict['model_input'])
+            # check onboard and not finsihed
+            if existing_run_results.capacity_provider == 'onboard' and (existing_run_results.model_output == None or existing_run_results.model_output['status'] != 'complete'):
+                model_runner = OnboardCompute(existing_run_results.model_input)
+                try:
+                    existing_run_results.model_output = model_runner.status()
+                    existing_run_results.save()
+                except:
+                    return Response({'error': 'Model Failed to retrive status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             serializer = self.get_serializer(existing_run_results)
             return Response(serializer.data)
         except:
             serializer.is_valid(raise_exception=True)
             sim_run = self.perform_create(serializer)
+            # sim_run.capacity_provider = 'Fargate'
             model_run = ModelRunner(serializer.data, sim_run, request)
-            model_run.submitJob()
+            try:
+                model_run.submitJob()
+            except:
+                return Response({'error': 'Model Failed to Start'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
             # THIS HAS ALL BEEN REPLACED WITH MODELRUNNER
             # sim_run_id = sim_run.id
             # webhook_token = sim_run.webhook_token
@@ -179,9 +200,21 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # put user in
         user = self.request.user
-
+        # add capacity provider
+        user_cp = User.objects.get(id=user.id)
+        if user_cp.groups.filter(name='Fargate').exists():
+            serializer.validated_data.update({'capacity_provider': 'FARGATE'})
+        elif user_cp.groups.filter(name='Fargate Spot').exists():
+            serializer.validated_data.update(
+                {'capacity_provider': 'FARGATE_SPOT'})
+        elif user_cp.groups.filter(name='Onboard Compute').exists():
+            serializer.validated_data.update(
+                {'capacity_provider': 'onboard_compute'})
+        else:
+            serializer.validated_data.update(
+                {'capacity_provider': 'FARGATE'})
         obj = serializer.save(user=user)
-        # Response(obj)
+
         return obj
 
 

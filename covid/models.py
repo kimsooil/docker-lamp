@@ -69,6 +69,8 @@ class SimulationRun(models.Model):
         _("Timestamp"), auto_now=False, auto_now_add=True)
     webhook_token = models.UUIDField(
         _("Webhook Token"), default=uuid.uuid4, editable=False)
+    capacity_provider = models.CharField(
+        _("Capacity Provider"), max_length=12, null=True)
 
     class Meta:
         verbose_name = _("Simulation Run")

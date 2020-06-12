@@ -18,6 +18,12 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 MODEL_API_BASE_URL = ENV('MODEL_API_BASE_URL',
                          default='http://localhost:5000/')
 MODEL_API_SUBPATH = ENV('MODEL_API_SUBPATH', default='/model/')
+MODEL_API_START = ENV('MODEL_API_RESULTS',
+                      default='api/v3/prediction/?')
+MODEL_API_STATUS = ENV('MODEL_API_RESULTS',
+                       default='api/v3/prediction_status/?')
+COVID_API_SIMULATIONS = ENV('COVID_API_SIMULATIONS',
+                            default='/covid/api/simulations/')
 MODEL_API_STATE = ENV('MODEL_API_STATE', default='Nebraska')
 MODEL_API_STATE_ABBREVIATION = ENV(
     'MODEL_API_STATE_ABBREVIATION', default='NE')

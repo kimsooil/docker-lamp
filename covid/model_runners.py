@@ -1,10 +1,14 @@
-from rest_framework.reverse import reverse
-from django.contrib.auth import get_user_model
-from django.conf import settings
-
 import json
 import time
 import boto3
+import urllib
+import requests
+
+from rest_framework.reverse import reverse
+from rest_framework.response import Response
+from django.contrib.auth import get_user_model
+from django.conf import settings
+
 s3_client = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                          aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY_ID)
 
@@ -18,15 +22,16 @@ class ModelRunner:
 
     def __init__(self, serialized_data, sim_run_data, request):
         self.serialized_data = serialized_data
+        self.request = request
         # if needed in the future, extraneous at this point
         # self.timestamp = serialized_data['timestamp']
-        # self.model_input = serialized_data['model_input']
+        self.model_input = serialized_data['model_input']
         # self.model_output = None
         self.id = sim_run_data.id
         self.webhook_token = str(sim_run_data.webhook_token)
         self.webhook_url = reverse(
             'simulations-webhook', args=[self.id], request=request)
-        self.capacity_provider = self.determineJobType(request)
+        self.capacity_provider = serialized_data['capacity_provider']
         self.s3_object = self.createS3Object()
 
         # can be submitted with just the constructor
@@ -39,18 +44,21 @@ class ModelRunner:
             Fargate(self.s3_object)
         elif self.capacity_provider == 'FARGATE_SPOT':
             FargateSpot(self.s3_object)
-        # need to implement onboard computes
-        # else:
-        #     OnboardCompute(self.serialized_data)
-
-    def determineJobType(self, request):
-        user = User.objects.get(id=request.user.id)
-        if user.groups.filter(name='Fargate').exists():
-            return 'FARGATE'
-        elif user.groups.filter(name='Fargate Spot').exists():
-            return'FARGATE_SPOT'
-        else:
-            return 'FARGATE'
+        elif self.capacity_provider == 'onboard':
+            model = OnboardCompute(self.model_input)
+            model.submitJob()
+    # moved to the view
+    # def determineJobType(self):
+    #     user = User.objects.get(id=request.user.id)
+    #     if user.groups.filter(name='Fargate').exists():
+    #         return 'FARGATE'
+    #     elif user.groups.filter(name='Fargate Spot').exists():
+    #         return'FARGATE_SPOT'
+    #     elif user.groups.filter(name='Onboard Compute').exists():
+    #         return'onboard_compute'
+    #     # default currently if not in group
+    #     else:
+    #         return 'onboard_compute'
 
     def createS3Object(self):
         if self.capacity_provider != 'onboard_compute':
@@ -74,6 +82,7 @@ class Fargate(ModelRunner):
     def submitJob(self):
         s3_data = str(json.dumps(self.s3_object))
         key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
+        print('FARGATE')
         # put in s3
         response = s3_client.put_object(
             Body=s3_data,
@@ -94,6 +103,7 @@ class FargateSpot(ModelRunner):
     def submitJob(self):
         s3_data = str(json.dumps(self.s3_object))
         key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
+        print('FARGATE SPOT')
         # put in s3
         response = s3_client.put_object(
             Body=s3_data,
@@ -102,7 +112,32 @@ class FargateSpot(ModelRunner):
         )
 
 
-# class OnboardCompute(ModelRunner):
-#     def submitJob(self):
-#         print('Onboard!!!')
-#         print(self.s3_object)
+class OnboardCompute(ModelRunner):
+    """
+    Subclass of ModelRunner to submit a Onboard Compute job
+    """
+
+    def __init__(self, model_input):
+        self.model_input = model_input
+
+    def submitJob(self):
+        print('onboard')
+        encode_params = urllib.parse.urlencode(self.model_input, True)
+        api_path = settings.MODEL_API_BASE_URL + \
+            settings.MODEL_API_START + str(encode_params)
+        r = requests.get(api_path)
+        r.raise_for_status()
+        return Response(r.json(), status=r.status_code)
+
+    def status(self):
+        encode_params = urllib.parse.urlencode(self.model_input, True)
+        api_path = settings.MODEL_API_BASE_URL + \
+            settings.MODEL_API_STATUS + str(encode_params)
+        r = requests.get(api_path)
+        r.raise_for_status()
+        return r.json()
+
+
+# https://seircast.org/backend/model/api/v3/prediction_status/?sim_length=60&shelter_date=2020-03-27&shelter_release_start_date=2020-05-04&shelter_release_end_date=2020-06-29&social_distancing=true&quarantine_percent=0&social_distancing_end_date=2020-06-15&quarantine_start_date=2020-08-01&country=US&state=Florida&nDraws=50000&county=Hillsborough&county=Pasco&county=Pinellas&county=Polk
+# /model/api/v3/prediction_status/?sim_length=62&shelter_date=2020-03-27&shelter_release_start_date=2020-05-04&shelter_release_end_date=2020-06-29&social_distancing=True&quarantine_percent=0&social_distancing_end_date=2020-06-15&quarantine_start_date=2020-08-01&country=US&state=Florida&nDraws=50000&county=%5B%27Hillsborough%27%2C+%27Pasco%27%2C+%27Pinellas%27%2C+%27Polk%27%5D
+# /model/api/v3/prediction_status/?country=US&state=Florida&shelter_date=2020-03-27&shelter_release_start_date=2020-05-04&shelter_release_end_date=2020-06-29&county=%5B%27Hillsborough%27%2C+%27Pasco%27%2C+%27Pinellas%27%2C+%27Polk%27%5D&sim_length=61&nDraws=50000&social_distancing=True&social_distancing_end_date=2020-06-15&quarantine_percent=0&quarantine_start_date=2020-08-01
