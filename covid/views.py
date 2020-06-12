@@ -203,7 +203,7 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
                 {'capacity_provider': 'onboard'})
         else:
             serializer.validated_data.update(
-                {'capacity_provider': 'onboard'})
+                {'capacity_provider': 'FARGATE'})
         obj = serializer.save(user=user)
 
         return obj
