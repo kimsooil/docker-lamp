@@ -134,15 +134,6 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             '-timestamp')[0].hash_value
         model_input_dict = request.data
         model_input_dict['model_input'].update({'data_hash': latest_hash})
-        # user_cp = User.objects.get(id=user.id)
-        # if user_cp.groups.filter(name='Fargate').exists():
-        #     model_input_dict.update({'capacity_provider': 'FARGATE'})
-        # elif user.groups.filter(name='Fargate Spot').exists():
-        #     model_input_dict.update({'capacity_provider': 'FARGATE_SPOT'})
-        # elif user.groups.filter(name='Onboard Compute').exists():
-        #     model_input_dict.update({'capacity_provider': 'onboard'})
-        # else:
-        #     model_input_dict.update({'capacity_provider': 'onboard'})
         serializer = SimulationRunSerializer(
             data=model_input_dict)
         try:
