@@ -8,7 +8,7 @@ class State(models.Model):
     abbreviation = models.CharField(_("Abbreviation"), max_length=50)
     country = models.CharField(_("Country"), max_length=50)
     # TODO possibly replace Postgres field with relation field
-    default_counties = ArrayField(models.CharField(_("County Name"), max_length=80), size=8,
+    default_counties = ArrayField(models.CharField(_("County Name"), max_length=80), size=10,
                                   help_text=_("Default Counties"))
     shelter_date = models.DateField(_("Shelter Date"))
     shelter_release_start_date = models.DateField(_("Shelter Release Start Date"))
