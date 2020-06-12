@@ -6,6 +6,7 @@ import requests
 
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
+from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
@@ -84,11 +85,14 @@ class Fargate(ModelRunner):
         key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
         print('FARGATE')
         # put in s3
-        response = s3_client.put_object(
-            Body=s3_data,
-            Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-            Key=key_name
-        )
+        try:
+            s3_client.put_object(
+                Body=s3_data,
+                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                Key=key_name
+            )
+        except:
+            return Response({'error': 'Failed to upload object to s3 - fargate'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class FargateSpot(ModelRunner):
@@ -105,11 +109,14 @@ class FargateSpot(ModelRunner):
         key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
         print('FARGATE SPOT')
         # put in s3
-        response = s3_client.put_object(
-            Body=s3_data,
-            Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-            Key=key_name
-        )
+        try:
+            s3_client.put_object(
+                Body=s3_data,
+                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                Key=key_name
+            )
+        except:
+            return Response({'error': 'Failed to upload object to s3 - spot'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class OnboardCompute(ModelRunner):

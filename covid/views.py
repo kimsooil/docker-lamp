@@ -200,10 +200,10 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
                 {'capacity_provider': 'FARGATE_SPOT'})
         elif user_cp.groups.filter(name='Onboard Compute').exists():
             serializer.validated_data.update(
-                {'capacity_provider': 'onboard_compute'})
+                {'capacity_provider': 'onboard'})
         else:
             serializer.validated_data.update(
-                {'capacity_provider': 'FARGATE'})
+                {'capacity_provider': 'onboard'})
         obj = serializer.save(user=user)
 
         return obj
