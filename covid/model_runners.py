@@ -10,10 +10,9 @@ from rest_framework import status
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
+# used to upload objects to s3 bucket
 s3_client = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                          aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY_ID)
-
-User = get_user_model()
 
 
 class ModelRunner:
@@ -24,14 +23,14 @@ class ModelRunner:
     def __init__(self, serialized_data, sim_run_data, request):
         self.serialized_data = serialized_data
         self.request = request
-        # if needed in the future, extraneous at this point
-        # self.timestamp = serialized_data['timestamp']
         self.model_input = serialized_data['model_input']
-        # self.model_output = None
         self.id = sim_run_data.id
+        # get webhook token
         self.webhook_token = str(sim_run_data.webhook_token)
+        #  create webhook url
         self.webhook_url = reverse(
             'simulations-webhook', args=[self.id], request=request)
+        #  determine capacity provider from the model
         self.capacity_provider = serialized_data['capacity_provider']
         self.s3_object = self.createS3Object()
 
@@ -40,7 +39,9 @@ class ModelRunner:
         # self.submitJob()
 
     def submit(self):
-        # currently no difference between FARGATE/FARGATE_SPOT
+        # submit job depending on capacity provider
+        # fargate and spot submit are called in the initialization of the object
+        # onboard submit needs to be called explicitly, as it is created to get status as well
         if self.capacity_provider == 'FARGATE':
             Fargate(self.s3_object)
         elif self.capacity_provider == 'FARGATE_SPOT':
@@ -48,20 +49,10 @@ class ModelRunner:
         elif self.capacity_provider == 'onboard':
             model = OnboardCompute(self.model_input)
             model.submit()
-    # moved to the view
-    # def determineJobType(self):
-    #     user = User.objects.get(id=request.user.id)
-    #     if user.groups.filter(name='Fargate').exists():
-    #         return 'FARGATE'
-    #     elif user.groups.filter(name='Fargate Spot').exists():
-    #         return'FARGATE_SPOT'
-    #     elif user.groups.filter(name='Onboard Compute').exists():
-    #         return'onboard_compute'
-    #     # default currently if not in group
-    #     else:
-    #         return 'onboard_compute'
 
     def createS3Object(self):
+        # create object to upload to S3 for fargate and spot which include additional data created in constructor
+        # onboard does not need s3 object
         if self.capacity_provider != 'onboard_compute':
             s3_dict = {'webhook_url': self.webhook_url,
                        'capacity_provider': self.capacity_provider, 'webhook_token': self.webhook_token}
@@ -78,13 +69,15 @@ class Fargate(ModelRunner):
 
     def __init__(self, s3_object):
         self.s3_object = s3_object
+        # submit the job on initialization of the instance
         self.submit()
 
     def submit(self):
+        # convert to string for put_object formatting
         s3_data = str(json.dumps(self.s3_object))
+        # add timestamp as object name for anything uploaded to S3
         key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
-        print('FARGATE')
-        # put in s3
+        # put in s3 to trigger lambda
         try:
             s3_client.put_object(
                 Body=s3_data,
@@ -97,20 +90,22 @@ class Fargate(ModelRunner):
 
 class FargateSpot(ModelRunner):
     """
-    Subclass of ModelRunner to submit a Fargate Spot job
+    Subclass of ModelRunner to submit a Fargate Spot job with no progress to webhook
     """
 
     def __init__(self, s3_object):
         self.s3_object = s3_object
+        # submit the job on initialization of the instance
         self.submit()
 
     def submit(self):
         # No progress updates to the webhook for spot
         self.s3_object.update({'progress_delay': 0})
+        # convert to string for put_object formatting
         s3_data = str(json.dumps(self.s3_object))
+        # add timestamp as object name for anything uploaded to S3
         key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
-        print('FARGATE SPOT')
-        # put in s3
+        # put in s3 to trigger lambda
         try:
             s3_client.put_object(
                 Body=s3_data,
@@ -131,22 +126,23 @@ class OnboardCompute(ModelRunner):
 
     def submit(self):
         print('onboard')
+        # encode model input, True used for list object (county)
         encode_params = urllib.parse.urlencode(self.model_input, True)
+        # create url from settings and encoded paramaters to submit job
         api_path = settings.MODEL_API_BASE_URL + \
             settings.MODEL_API_START + str(encode_params)
+        # send get request to start the job and get response
         r = requests.get(api_path)
         r.raise_for_status()
         return Response(r.json(), status=r.status_code)
 
     def status(self):
+        # encode model input, True used for list object (county)
         encode_params = urllib.parse.urlencode(self.model_input, True)
+        # create url from settings and encoded paramaters to get status of job
         api_path = settings.MODEL_API_BASE_URL + \
             settings.MODEL_API_STATUS + str(encode_params)
+        # send get request to receive satatus for job and get response
         r = requests.get(api_path)
         r.raise_for_status()
         return r.json()
-
-
-# https://seircast.org/backend/model/api/v3/prediction_status/?sim_length=60&shelter_date=2020-03-27&shelter_release_start_date=2020-05-04&shelter_release_end_date=2020-06-29&social_distancing=true&quarantine_percent=0&social_distancing_end_date=2020-06-15&quarantine_start_date=2020-08-01&country=US&state=Florida&nDraws=50000&county=Hillsborough&county=Pasco&county=Pinellas&county=Polk
-# /model/api/v3/prediction_status/?sim_length=62&shelter_date=2020-03-27&shelter_release_start_date=2020-05-04&shelter_release_end_date=2020-06-29&social_distancing=True&quarantine_percent=0&social_distancing_end_date=2020-06-15&quarantine_start_date=2020-08-01&country=US&state=Florida&nDraws=50000&county=%5B%27Hillsborough%27%2C+%27Pasco%27%2C+%27Pinellas%27%2C+%27Polk%27%5D
-# /model/api/v3/prediction_status/?country=US&state=Florida&shelter_date=2020-03-27&shelter_release_start_date=2020-05-04&shelter_release_end_date=2020-06-29&county=%5B%27Hillsborough%27%2C+%27Pasco%27%2C+%27Pinellas%27%2C+%27Polk%27%5D&sim_length=61&nDraws=50000&social_distancing=True&social_distancing_end_date=2020-06-15&quarantine_percent=0&quarantine_start_date=2020-08-01

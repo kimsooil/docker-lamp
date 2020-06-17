@@ -100,7 +100,8 @@ class HardCodedModelOutputAPIView(ProtectedResourceView, APIView):
 # class RunModelProtectedAPIView(ProtectedResourceView, APIView):
 class SimulationRunViewSet(viewsets.ModelViewSet):
     """
-    A simple ViewSet for viewing and editing accounts.
+    Simulation run viewset to handle webhook, create simulation runs, and get status updates 
+    for the simulation runs
     """
     queryset = SimulationRun.objects.all()
     serializer_class = SimulationRunSerializer
@@ -113,12 +114,13 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         sim_run = self.get_object()
         # validate webhook
         if str(sim_run.webhook_token) == request.data['webhook_token']:
-            # ensure model is not complete
             if not request.data.get('output'):
                 return Response({'status': "webhook payload must contain an 'output' key."}, status=status.HTTP_400_BAD_REQUEST)
+            # ensure model is not complete
             elif sim_run.model_output != None and type(sim_run.model_output) is dict and sim_run.model_output.get('status', None) == 'complete':
                 return Response({'status': 'model completed'}, status=status.HTTP_400_BAD_REQUEST)
             else:
+                # update model output and save
                 sim_run.model_output = request.data['output']
                 sim_run.save()
                 serializer = self.get_serializer(sim_run)
@@ -130,60 +132,42 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             return Response({'status': 'invalid webhook token'}, status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
+        # retrieve latest hash value
         latest_hash = HashValue.objects.all().order_by(
             '-timestamp')[0].hash_value
         model_input_dict = request.data
         model_input_dict['model_input'].update({'data_hash': latest_hash})
+        # look for existing run with same inputs
         serializer = SimulationRunSerializer(
             data=model_input_dict)
         try:
+            # get existing run
             existing_run_results = SimulationRun.objects.get(
                 model_input=model_input_dict['model_input'])
             # check onboard and not finsihed
             if existing_run_results.capacity_provider == 'onboard' and (existing_run_results.model_output == None or existing_run_results.model_output['status'] != 'complete'):
+                # create onboard model runner to check for status
                 model_runner = OnboardCompute(existing_run_results.model_input)
                 try:
+                    # get status update and save to model output
                     existing_run_results.model_output = model_runner.status()
                     existing_run_results.save()
                 except:
                     return Response({'error': 'Model Failed to retrive status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # get most recent status update for model
             serializer = self.get_serializer(existing_run_results)
             return Response(serializer.data)
         except:
+            # validate data
             serializer.is_valid(raise_exception=True)
             sim_run = self.perform_create(serializer)
-            # sim_run.capacity_provider = 'Fargate'
+            # create model runner class for either Fargate, Spot, or Onboard depending on capacity provider
             model_run = ModelRunner(serializer.data, sim_run, request)
             try:
+                # submit job for newly created model runner
                 model_run.submit()
             except:
                 return Response({'error': 'Model Failed to Start'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            # THIS HAS ALL BEEN REPLACED WITH MODELRUNNER
-            # sim_run_id = sim_run.id
-            # webhook_token = sim_run.webhook_token
-            # webhook_token_dict = {'webhook_token': str(webhook_token)}
-            # webhook_url = reverse('simulations-webhook',
-            #                       args=[sim_run_id], request=request)
-            # webhook_dict = {'webhook_url': webhook_url}
-            # s3_dict = webhook_dict
-            # # check user group for spot fargate launch
-            # user = User.objects.get(id=request.user.id)
-            # if user.groups.filter(name='Fargate Spot').exists():
-            #     s3_dict.update({'capacity_provider': 'FARGATE_SPOT'})
-            # else:
-            #     s3_dict.update({'capacity_provider': 'FARGATE'})
-            # s3_dict.update(webhook_token_dict)
-            # s3_dict.update(serializer.data)
-            # print(s3_dict)
-            # s3_data = str(json.dumps(s3_dict))
-            # key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
-            # # put in s3
-            # response = s3_client.put_object(
-            #     Body=s3_data,
-            #     Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-            #     Key=key_name
-            # )
 
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
@@ -193,6 +177,9 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         user = self.request.user
         # add capacity provider
         user_cp = User.objects.get(id=user.id)
+        # filter users by group and add appropriate capacity provider to validated data to ensure
+        # it only gets added one time on creation
+        # default to FARGATE if user is not in a group
         if user_cp.groups.filter(name='Fargate').exists():
             serializer.validated_data.update({'capacity_provider': 'FARGATE'})
         elif user_cp.groups.filter(name='Fargate Spot').exists():
@@ -210,6 +197,9 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
 
 
 class HashResourceAPIView(APIView):
+    """
+    A simple ViewSet for viewing and posting hashvalues in the database.
+    """
 
     def get(self, request, format=None):
         queryset = HashValue.objects.all().order_by('id')

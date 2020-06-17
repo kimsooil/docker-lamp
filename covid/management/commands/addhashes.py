@@ -7,7 +7,6 @@ import ssl
 
 def download_precomputes(self, data_hash):
     # filename info
-    # model_base_location = 'https://gibson.crc.nd.edu/covid_pre_compute/'
     model_base_location = 'http://www.crc.nd.edu/~csweet1/covid_pre_compute/'
     model_file_list = 'model_files.txt'
     model_local = 'output/'
@@ -16,15 +15,14 @@ def download_precomputes(self, data_hash):
 
     # check to see if we already did this
     # if hash not already in database
-    # if not os.path.isfile(model_local + data_hash + '.files'):
     try:
         HashValue.objects.get(hash_value=data_hash)
         return 1
     except HashValue.DoesNotExist:
-        # get filenames
+        # ensure that model files exist to ensure this is a valid hash
         resp = str(requests.get(model_base_location + data_hash + '/' +
                                 model_file_list))
-
+        # failed or succeeded
         if '404' in resp:
             self.stdout.write("No data available")
             return -1
@@ -54,6 +52,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if options['delete']:
+            # delete all hashes in database
             all_hashes = HashValue.objects.all()
             for hash in all_hashes:
                 hash.delete()
@@ -90,7 +89,7 @@ class Command(BaseCommand):
                     if data_point['commit']['message'] == "automated update":
 
                         # break if we hit hash in database already, rest will already be added
-                        # only used if --all not specified
+                        # only used if --all NOT specified
                         if previously_added == True:
                             break
                         # sending get request and saving the response as response object
@@ -111,8 +110,6 @@ class Command(BaseCommand):
                         # check to see if our file was updated
                         for file in commit_data['files']:
                             if confirmed_filename in file['filename']:
-                                # self.stdout.write(
-                                #     "matching " + data_point['commit']['committer']['date'] + str(commmit_date) + str(current_time))
                                 # is the commit newer?
                                 if commmit_date > current_time:
 
@@ -122,29 +119,25 @@ class Command(BaseCommand):
                                     # if downloaded add hash
                                     if ret == 0:
                                         # add data_point['sha'] to database with timestamp
-                                        # if hash not currently in
+                                        # if hash not currently in database
                                         self.stdout.write(
                                             "Adding Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'])
 
                                         try:
+                                            # create hash
                                             new_hash = HashValue.create(data_point['sha'],
                                                                         data_point['commit']['committer']['date'])
                                             self.stdout.write(
                                                 "Created Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'])
+                                            # save hash
                                             new_hash.save()
                                             self.stdout.write(
                                                 "Saved Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'] + " to database.")
-                                        # except FieldError:
-                                        #     self.stdout.write("Field Error")
-                                        #     pass
-                                        # except ValidationError:
-                                        #     self.stdout.write("Validation Error")
-                                        #     pass
                                         except:
                                             self.stdout.write(
                                                 "Failed to add hash (could already exist): "+data_point['sha'])
                                             pass
-                                    # used only if you have existing hashes and only want most recent to be added
+                                    # used only if you have existing hashes in db and only want most recent to be added
                                     elif not options['all'] and ret == 1:
                                         # this has already been added and so have all after (timeordered)
                                         previously_added = True
