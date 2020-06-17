@@ -39,7 +39,7 @@ class ModelRunner:
         # remove submitJob in views.py
         # self.submitJob()
 
-    def submitJob(self):
+    def submit(self):
         # currently no difference between FARGATE/FARGATE_SPOT
         if self.capacity_provider == 'FARGATE':
             Fargate(self.s3_object)
@@ -47,7 +47,7 @@ class ModelRunner:
             FargateSpot(self.s3_object)
         elif self.capacity_provider == 'onboard':
             model = OnboardCompute(self.model_input)
-            model.submitJob()
+            model.submit()
     # moved to the view
     # def determineJobType(self):
     #     user = User.objects.get(id=request.user.id)
@@ -78,9 +78,9 @@ class Fargate(ModelRunner):
 
     def __init__(self, s3_object):
         self.s3_object = s3_object
-        self.submitJob()
+        self.submit()
 
-    def submitJob(self):
+    def submit(self):
         s3_data = str(json.dumps(self.s3_object))
         key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
         print('FARGATE')
@@ -102,9 +102,11 @@ class FargateSpot(ModelRunner):
 
     def __init__(self, s3_object):
         self.s3_object = s3_object
-        self.submitJob()
+        self.submit()
 
-    def submitJob(self):
+    def submit(self):
+        # No progress updates to the webhook for spot
+        self.s3_object.update({'progress_delay': 0})
         s3_data = str(json.dumps(self.s3_object))
         key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
         print('FARGATE SPOT')
@@ -127,7 +129,7 @@ class OnboardCompute(ModelRunner):
     def __init__(self, model_input):
         self.model_input = model_input
 
-    def submitJob(self):
+    def submit(self):
         print('onboard')
         encode_params = urllib.parse.urlencode(self.model_input, True)
         api_path = settings.MODEL_API_BASE_URL + \

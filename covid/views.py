@@ -155,7 +155,7 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             # sim_run.capacity_provider = 'Fargate'
             model_run = ModelRunner(serializer.data, sim_run, request)
             try:
-                model_run.submitJob()
+                model_run.submit()
             except:
                 return Response({'error': 'Model Failed to Start'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

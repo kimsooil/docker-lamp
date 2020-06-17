@@ -75,7 +75,7 @@ services:
         links:
             - "postgresdb"
     model:
-        image: threaded-model
+        image: zazu.crc.nd.edu/covid/models:latest
         restart: unless-stopped
         networks:
             - backend
