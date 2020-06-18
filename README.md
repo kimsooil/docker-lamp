@@ -49,7 +49,7 @@ All 3 of these simulation run resources depend on a data hash which is updated d
   - manage.py addhashes --all
       - adds every data hash available on github to the database
       - used the very first time the database is populated or after you have deleted all data hashes
-  -manage.py addhashes --delete
+  - manage.py addhashes --delete
       - deletes all hash values stored in the database
       - to be used if there is an error with the data hashes currently stored in the databse
       
