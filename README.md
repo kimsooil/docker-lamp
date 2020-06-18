@@ -40,7 +40,7 @@ The ModelRunner handles starting any of the jobs on any of the 3 resources.
   - The model runner will send a request to a flask api with the model inputs to a flask api to start the projection
   - The model runner will send new requests to the flask api to receive status updates for the model, once it has been verified as a running or completed model
  
- #### HashValue
+### HashValue
 All 3 of these simulation run resources depend on a data hash which is updated daily via github. The data hash can be updated using a manage.py command - addhashes. The model default is to use the most recent hash in the database, if the addhashes --all is not run prior to using this repository, it will fail every time.
 
   - manage.py addhashes
