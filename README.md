@@ -3,7 +3,7 @@ This is DJANGO dockerized application for displaying COVID-19 projections.
 
 In order to begin using this repository, along with any other migrations that involve user groups, you will immediately need to run the manage.py addhashes --all to download all the current datahashes used for the model. Without these, the model will not run. The command is outlined further below.
 
-## The covid folder contains 4 main DJANGO Models for the projections:
+### The covid folder contains 4 Django Models for the projections:
 1. State
 2. County
 3. SimulationRun
