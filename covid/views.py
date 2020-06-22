@@ -104,7 +104,7 @@ class HardCodedModelOutputAPIView(ProtectedResourceView, APIView):
 # class RunModelProtectedAPIView(ProtectedResourceView, APIView):
 class SimulationRunViewSet(viewsets.ModelViewSet, mixins.ListModelMixin):
     """
-    Simulation run viewset to handle webhook, create simulation runs, and get status updates 
+    Simulation run viewset to handle webhook, create simulation runs, and get status updates
     for the simulation runs
     """
     queryset = SimulationRun.objects.all()
@@ -162,9 +162,9 @@ class SimulationRunViewSet(viewsets.ModelViewSet, mixins.ListModelMixin):
             now = datetime.utcnow().replace(tzinfo=utc)
             max_time = existing_run_results.timestamp+timedelta(hours=1)
             # check to ensure model has returned results within 1 hour, exception resubmits the job after deletion
-            if now > max_time and existing_run_results.model_output['status'] != 'complete':
+            if now > max_time and existing_run_results.model_output.get('status', 'none') != 'complete':
                 existing_run_results.delete()
-                raise Exception("model failed to complete within 30 minutes")
+                raise Exception("model failed to complete within 1 hour")
 
             # get most recent status update for model
             serializer = self.get_serializer(existing_run_results)
