@@ -25,7 +25,6 @@ import urllib.parse
 from datetime import datetime, timedelta
 from django.utils.timezone import utc
 from rest_framework import serializers
-from rest_framework import mixins
 from .model_runners import ModelRunner, OnboardCompute
 s3_client = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                          aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY_ID)
@@ -102,7 +101,7 @@ class HardCodedModelOutputAPIView(ProtectedResourceView, APIView):
 
 
 # class RunModelProtectedAPIView(ProtectedResourceView, APIView):
-class SimulationRunViewSet(viewsets.ModelViewSet, mixins.ListModelMixin):
+class SimulationRunViewSet(viewsets.ModelViewSet):
     """
     Simulation run viewset to handle webhook, create simulation runs, and get status updates
     for the simulation runs
@@ -178,7 +177,6 @@ class SimulationRunViewSet(viewsets.ModelViewSet, mixins.ListModelMixin):
 
             # submit job for newly created model runner
             submit_job = model_run.submit()
-            print(submit_job)
             # only dict type is failed submissions, rest are Requests
             if type(submit_job) is dict:
                 delete_run = SimulationRun.objects.get(pk=sim_run.id)
@@ -210,6 +208,40 @@ class SimulationRunViewSet(viewsets.ModelViewSet, mixins.ListModelMixin):
         obj = serializer.save(user=user)
 
         return obj
+
+    @action(methods=['get'], detail=False, permission_classes=[AllowAny],
+            url_path='status', url_name='find_simulation')
+    def status(self, request, pk=None):
+        query_str = request.META['QUERY_STRING']
+        model_input_vals = dict(urllib.parse.parse_qs(query_str))
+        # convert list items to string values, except county
+        for key, val in model_input_vals.items():
+            if key != 'county':
+                model_input_vals[key] = val[0]
+        # convert quarantine percent to number
+        model_input_vals['quarantine_percent'] = int(
+            model_input_vals['quarantine_percent'])
+        model_input_dict = {'model_input': model_input_vals}
+        latest_hash = HashValue.objects.all().order_by(
+            '-timestamp')[0].hash_value
+        model_input_dict['model_input'].update({'data_hash': latest_hash})
+        # look for existing run if exists
+        try:
+            existing_run_results = SimulationRun.objects.get(
+                model_input=model_input_dict['model_input'])
+
+            # check onboard and not finsihed, update if so
+            if existing_run_results.capacity_provider == 'onboard' and (existing_run_results.model_output == None or existing_run_results.model_output['status'] != 'complete'):
+                model_runner = OnboardCompute(existing_run_results.model_input)
+                try:
+                    existing_run_results.model_output = model_runner.status()
+                    existing_run_results.save()
+                except:
+                    return Response({'error': 'Model Failed to retrieve status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            serializer = self.get_serializer(existing_run_results)
+            return Response(serializer.data)
+        except:
+            return Response({'error': 'Model Does Not Exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class HashResourceAPIView(APIView):
