@@ -211,6 +211,7 @@ class SimulationRunViewSet(viewsets.ModelViewSet, mixins.ListModelMixin):
 
         return obj
 
+
 class HashResourceAPIView(APIView):
     """
     A simple ViewSet for viewing and posting hashvalues in the database.
@@ -227,12 +228,3 @@ class HashResourceAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# https://seircast.org/backend/model/api/v3/prediction_status/?sim_length=140&shelter_date=2020-03-27&shelter_release_start_date=2020-05-04&shelter_release_end_date=2020-06-29&social_distancing=true&quarantine_percent=0&social_distancing_end_date=2020-06-15&quarantine_start_date=2020-08-01&country=US&state=Florida&nDraws=50059&county=Hillsborough
-
-        # [
-        #     0.09,
-        #     0.23,
-        #     1.48
-        # ],
