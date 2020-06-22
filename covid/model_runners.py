@@ -34,21 +34,21 @@ class ModelRunner:
         self.capacity_provider = serialized_data['capacity_provider']
         self.s3_object = self.createS3Object()
 
-        # can be submitted with just the constructor
-        # remove submitJob in views.py
-        # self.submitJob()
-
     def submit(self):
         # submit job depending on capacity provider
         # fargate and spot submit are called in the initialization of the object
         # onboard submit needs to be called explicitly, as it is created to get status as well
         if self.capacity_provider == 'FARGATE':
-            Fargate(self.s3_object)
+            model = Fargate(self.s3_object)
+            response = model.submit()
         elif self.capacity_provider == 'FARGATE_SPOT':
-            FargateSpot(self.s3_object)
+            model = FargateSpot(self.s3_object)
+            response = model.submit()
         elif self.capacity_provider == 'onboard':
             model = OnboardCompute(self.model_input)
-            model.submit()
+            response = model.submit()
+
+        return(response)
 
     def createS3Object(self):
         # create object to upload to S3 for fargate and spot which include additional data created in constructor
@@ -69,8 +69,6 @@ class Fargate(ModelRunner):
 
     def __init__(self, s3_object):
         self.s3_object = s3_object
-        # submit the job on initialization of the instance
-        self.submit()
 
     def submit(self):
         # convert to string for put_object formatting
@@ -84,8 +82,9 @@ class Fargate(ModelRunner):
                 Bucket=settings.AWS_STORAGE_BUCKET_NAME,
                 Key=key_name
             )
+            return Response({'success': 'Started model'}, status=status.HTTP_200_OK)
         except:
-            return Response({'error': 'Failed to upload object to s3 - fargate'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return {'error': 'Failed to upload object to s3 - fargate'}
 
 
 class FargateSpot(ModelRunner):
@@ -94,13 +93,10 @@ class FargateSpot(ModelRunner):
     """
 
     def __init__(self, s3_object):
-        self.s3_object = s3_object
-        # submit the job on initialization of the instance
-        self.submit()
+        # No progress updates to the webhook for spot
+        self.s3_object = s3_object.update({'progress_delay': 0})
 
     def submit(self):
-        # No progress updates to the webhook for spot
-        self.s3_object.update({'progress_delay': 0})
         # convert to string for put_object formatting
         s3_data = str(json.dumps(self.s3_object))
         # add timestamp as object name for anything uploaded to S3
@@ -112,8 +108,9 @@ class FargateSpot(ModelRunner):
                 Bucket=settings.AWS_STORAGE_BUCKET_NAME,
                 Key=key_name
             )
+            return Response({'success': 'Started model'}, status=status.HTTP_200_OK)
         except:
-            return Response({'error': 'Failed to upload object to s3 - spot'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return {'error': 'Failed to upload object to s3 - spot'}
 
 
 class OnboardCompute(ModelRunner):
@@ -125,7 +122,6 @@ class OnboardCompute(ModelRunner):
         self.model_input = model_input
 
     def submit(self):
-        print('onboard')
         # encode model input, True used for list object (county)
         encode_params = urllib.parse.urlencode(self.model_input, True)
         # create url from settings and encoded paramaters to submit job
@@ -133,7 +129,11 @@ class OnboardCompute(ModelRunner):
             settings.MODEL_API_START + str(encode_params)
         # send get request to start the job and get response
         r = requests.get(api_path)
-        r.raise_for_status()
+        try:
+            r.raise_for_status()
+        except:
+            return r.json()
+
         return Response(r.json(), status=r.status_code)
 
     def status(self):

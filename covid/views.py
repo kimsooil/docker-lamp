@@ -21,7 +21,11 @@ from django.db import models
 # from urls import urlpatterns
 import boto3
 import time
+import urllib.parse
+from datetime import datetime, timedelta
+from django.utils.timezone import utc
 from rest_framework import serializers
+from rest_framework import mixins
 from .model_runners import ModelRunner, OnboardCompute
 s3_client = boto3.client('s3', aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
                          aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY_ID)
@@ -98,7 +102,7 @@ class HardCodedModelOutputAPIView(ProtectedResourceView, APIView):
 
 
 # class RunModelProtectedAPIView(ProtectedResourceView, APIView):
-class SimulationRunViewSet(viewsets.ModelViewSet):
+class SimulationRunViewSet(viewsets.ModelViewSet, mixins.ListModelMixin):
     """
     Simulation run viewset to handle webhook, create simulation runs, and get status updates 
     for the simulation runs
@@ -153,7 +157,15 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
                     existing_run_results.model_output = model_runner.status()
                     existing_run_results.save()
                 except:
-                    return Response({'error': 'Model Failed to retrive status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    return Response({'error': 'Model Failed to retreive status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            now = datetime.utcnow().replace(tzinfo=utc)
+            max_time = existing_run_results.timestamp+timedelta(hours=1)
+            # check to ensure model has returned results within 1 hour, exception resubmits the job after deletion
+            if now > max_time and existing_run_results.model_output['status'] != 'complete':
+                existing_run_results.delete()
+                raise Exception("model failed to complete within 30 minutes")
+
             # get most recent status update for model
             serializer = self.get_serializer(existing_run_results)
             return Response(serializer.data)
@@ -163,11 +175,15 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             sim_run = self.perform_create(serializer)
             # create model runner class for either Fargate, Spot, or Onboard depending on capacity provider
             model_run = ModelRunner(serializer.data, sim_run, request)
-            try:
-                # submit job for newly created model runner
-                model_run.submit()
-            except:
-                return Response({'error': 'Model Failed to Start'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            # submit job for newly created model runner
+            submit_job = model_run.submit()
+            print(submit_job)
+            # only dict type is failed submissions, rest are Requests
+            if type(submit_job) is dict:
+                delete_run = SimulationRun.objects.get(pk=sim_run.id)
+                delete_run.delete()
+                return Response(submit_job, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
@@ -190,11 +206,10 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
                 {'capacity_provider': 'onboard'})
         else:
             serializer.validated_data.update(
-                {'capacity_provider': 'FARGATE'})
+                {'capacity_provider': 'onboard'})
         obj = serializer.save(user=user)
 
         return obj
-
 
 class HashResourceAPIView(APIView):
     """
@@ -212,3 +227,12 @@ class HashResourceAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# https://seircast.org/backend/model/api/v3/prediction_status/?sim_length=140&shelter_date=2020-03-27&shelter_release_start_date=2020-05-04&shelter_release_end_date=2020-06-29&social_distancing=true&quarantine_percent=0&social_distancing_end_date=2020-06-15&quarantine_start_date=2020-08-01&country=US&state=Florida&nDraws=50059&county=Hillsborough
+
+        # [
+        #     0.09,
+        #     0.23,
+        #     1.48
+        # ],
