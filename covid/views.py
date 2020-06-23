@@ -161,7 +161,7 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             now = datetime.utcnow().replace(tzinfo=utc)
             max_time = existing_run_results.timestamp+timedelta(hours=1)
             # check to ensure model has returned results within 1 hour, exception resubmits the job after deletion
-            if now > max_time and (existing_run_results.model_output == None or existing_run_results.model_output.get('status','none') != 'complete'):
+            if now > max_time and (existing_run_results.model_output == None or existing_run_results.model_output.get('status', 'none') != 'complete'):
                 existing_run_results.delete()
                 raise Exception("model failed to complete within 1 hour")
 

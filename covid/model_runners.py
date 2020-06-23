@@ -93,8 +93,9 @@ class FargateSpot(ModelRunner):
     """
 
     def __init__(self, s3_object):
+        self.s3_object = s3_object
         # No progress updates to the webhook for spot
-        self.s3_object = s3_object.update({'progress_delay': 0})
+        self.s3_object.update({'progress_delay': 0})
 
     def submit(self):
         # convert to string for put_object formatting
