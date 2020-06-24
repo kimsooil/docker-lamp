@@ -1,5 +1,5 @@
 import json
-import time
+from datetime import datetime
 import boto3
 import urllib
 import requests
@@ -74,7 +74,8 @@ class Fargate(ModelRunner):
         # convert to string for put_object formatting
         s3_data = str(json.dumps(self.s3_object))
         # add timestamp as object name for anything uploaded to S3
-        key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
+        key_name = datetime.now().strftime(
+            "%Y%m%d-%H%M%S.%f")[:-3] + "-ndcovid.json"
         # put in s3 to trigger lambda
         try:
             s3_client.put_object(
@@ -101,7 +102,8 @@ class FargateSpot(ModelRunner):
         # convert to string for put_object formatting
         s3_data = str(json.dumps(self.s3_object))
         # add timestamp as object name for anything uploaded to S3
-        key_name = time.strftime("%Y%m%d-%H%M%S") + "-ndcovid.json"
+        key_name = datetime.now().strftime(
+            "%Y%m%d-%H%M%S.%f")[:-3] + "-ndcovid.json"
         # put in s3 to trigger lambda
         try:
             s3_client.put_object(
