@@ -56,11 +56,11 @@ API_DEFAULT_HIGH_RISK_QUARANTINE_PERCENT = ENV.int(
 API_DEFAULT_NDRAWS = ENV.int('DJANGO_API_DEFAULT_NDRAWS', default=50000)
 API_DEFAULT_STATE = ENV.str('DJANGO_API_DEFAULT_STATE', default='Florida')
 
-# Override token expiration period. Access token will expire after 90 days.
-OAUTH2_PROVIDER['ACCESS_TOKEN_EXPIRE_SECONDS'] = 7776000
-
 # AWS SETTINGS
 AWS_ACCESS_KEY_ID = ENV.str('AWS_ACCESS_KEY_ID', default='')
 AWS_SECRET_ACCESS_KEY_ID = ENV.str('AWS_SECRET_ACCESS_KEY_ID', default='')
 AWS_STORAGE_BUCKET_NAME = ENV.str('AWS_STORAGE_BUCKET_NAME', default='')
 AWS_REGION_NAME = ENV.str('AWS_REGION_NAME', default='')
+
+# Override token expiration period. Access token will expire after 90 days.
+OAUTH2_PROVIDER['ACCESS_TOKEN_EXPIRE_SECONDS'] = 7776000
