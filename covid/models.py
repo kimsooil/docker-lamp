@@ -18,12 +18,9 @@ class State(models.Model):
     shelter_release_start_date = models.DateField(
         _("Shelter Release Start Date"))
     shelter_release_end_date = models.DateField(_("Shelter Release End Date"))
-    social_distancing = models.BooleanField(
-        _("Social Distancing"), default=True)
-    social_distancing_end_date = models.DateField(
-        _("Social Distancing End Date"))
-    quarantine_percent = models.PositiveSmallIntegerField(
-        _("Percentage Quarantined"), default=0)
+    social_distancing = models.BooleanField(_("Social Distancing"), default=False)
+    social_distancing_end_date = models.DateField(_("Social Distancing End Date"))
+    quarantine_percent = models.PositiveSmallIntegerField(_("Percentage Quarantined"), default=0)
     quarantine_start_date = models.DateField(_("Quarantine Start Date"))
 
     class Meta:
