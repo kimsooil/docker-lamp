@@ -1,12 +1,41 @@
 from django.core.management.base import BaseCommand, CommandError
-from covid.models import HashValue
+from django.core.files.base import ContentFile
+from covid.models import HashValue, HashFile
 import requests
 import datetime
 import ssl
+import json
+import os
+import shutil
+
+
+def create_save_hash_file(content, path):
+    hash_file = HashFile()
+    file_content = ContentFile(content)
+    hash_file.file.save(path, file_content)
+    hash_file.save()
+    return hash_file
+
+
+def remove_current_dir(path):
+    """
+    Removes all current hash files from the directory
+    """
+    if os.path.exists(path):
+        shutil.rmtree(path)
+
+
+def remove_files_from_db():
+    """ 
+    Removes all current hash files from the database
+    """
+    queryset = HashFile.objects.all().order_by('id')
+    for file in queryset:
+        file.delete()
 
 
 def download_precomputes(self, data_hash):
-    # filename info
+        # filename info
     model_base_location = 'http://www.crc.nd.edu/~csweet1/covid_pre_compute/'
     model_file_list = 'model_files.txt'
     model_local = 'output/'
@@ -20,15 +49,89 @@ def download_precomputes(self, data_hash):
         return 1
     except HashValue.DoesNotExist:
         # ensure that model files exist to ensure this is a valid hash
-        resp = str(requests.get(model_base_location + data_hash + '/' +
-                                model_file_list))
+        resp = requests.get(model_base_location + data_hash + '/' +
+                            model_file_list)
+        # str_resp = str(resp)
         # failed or succeeded
-        if '404' in resp:
+        if resp.status_code == 400:
             self.stdout.write("No data available")
             return -1
-        elif '200' in resp:
+        elif resp.status_code == 200:
             self.stdout.write("Data is available")
-            return 0
+            # remove all current files from db
+            remove_files_from_db()
+            # remove output folder to replace with new content
+            remove_current_dir('app/hash_files/output')
+            # if os.path.exists('app/hash_files/output'):
+            #     shutil.rmtree('app/hash_files/output')
+
+            path = model_local+'/'+model_file_list
+            hash_file = create_save_hash_file(resp.text, path)
+
+            # get current path to the file object
+            hash_file_obj = hash_file.file.path
+
+            # check if files in filename
+            files_listed = True
+            # get file
+            with open(hash_file_obj) as model_files:
+                files = model_files.readlines()
+
+                files = [x.strip() for x in files]
+                # check file has models
+                if 'model_' not in files[0]:
+                    self.stdout.write("no data available")
+
+                    # remove file
+                    os.remove(hash_file_obj)
+
+                    # flag
+                    files_listed = False
+
+                    # return
+                    return -1
+
+            # process data if files
+            count_files = 0
+            if files_listed:
+                # loop through files
+                for file_name in files:
+                    # dont get files list
+                    if file_name != 'model_files.txt':
+                        count_files = count_files + 1
+                        # get json files
+                        resp = requests.get(model_base_location + data_hash + '/' +
+                                            file_name)
+                        # save the file
+                        path = model_local+'/'+file_name
+                        create_save_hash_file(resp.text, path)
+
+                # print success
+                self.stdout.write("Downloaded " + data_hash + ", " +
+                                  str(count_files) + " files.")
+                # return
+                return 0
+                # return 1
+
+
+def download_inputs(self, data_hash):
+    confirmed_filename = 'time_series_covid19_confirmed_US.csv'
+    deaths_filename = 'time_series_covid19_deaths_US.csv'
+    base_address = 'http://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/'
+    base_folder = 'input/'
+
+    # remove output folder to replace with new content
+    if os.path.exists('app/hash_files/input'):
+        shutil.rmtree('app/hash_files/input')
+
+    resp_conf = requests.get(base_address + confirmed_filename)
+    resp_death = requests.get(base_address + deaths_filename)
+
+    path = base_folder+confirmed_filename
+    create_save_hash_file(resp_conf.text, path)
+
+    path = base_folder+deaths_filename
+    create_save_hash_file(resp_death.text, path)
 
 
 class Command(BaseCommand):
@@ -136,13 +239,19 @@ class Command(BaseCommand):
                                         except:
                                             self.stdout.write(
                                                 "Failed to add hash (could already exist): "+data_point['sha'])
-                                            pass
+                                        # self.stdout.write(
+                                        #     "Should have added hash: " + data_point['sha'])
+                                        previously_added = True
+                                        download_inputs(
+                                            self, data_point['sha'])
                                     # used only if you have existing hashes in db and only want most recent to be added
                                     elif not options['all'] and ret == 1:
                                         # this has already been added and so have all after (timeordered)
                                         previously_added = True
 
                                 break  # need to exit as ordered in time
+                    # remove this
+                        # break
 
             else:
                 self.stdout.write("Hourly API rate limit exceeded!")

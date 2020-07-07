@@ -12,8 +12,8 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from django.conf import settings
 from django.forms.models import model_to_dict
 
-from .models import County, State, SimulationRun, HashValue
-from .serializers import CountySerializer, SimulationRunSerializer, HashValueSerializer
+from .models import County, State, SimulationRun, HashValue, HashFile
+from .serializers import CountySerializer, SimulationRunSerializer, HashValueSerializer, HashFileSerializer
 
 
 from django.contrib.auth import get_user_model
@@ -221,10 +221,18 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         # convert quarantine percent to number
         model_input_vals['quarantine_percent'] = int(
             model_input_vals['quarantine_percent'])
+        # get the max age of the model input and remove from model input
+        if 'max_age' in model_input_vals:
+            max_age = int(model_input_vals['max_age'])
+            model_input_vals.pop('max_age')
+        else:
+            max_age = -1
         model_input_dict = {'model_input': model_input_vals}
-        latest_hash = HashValue.objects.all().order_by(
-            '-timestamp')[0].hash_value
-        model_input_dict['model_input'].update({'data_hash': latest_hash})
+
+        # latest_hash = HashValue.objects.all().order_by(
+        #     '-timestamp')[0].hash_value
+        # model_input_dict['model_input'].update({'data_hash': latest_hash})
+
         # look for existing run if exists
         try:
             existing_run_results = SimulationRun.objects.get(
@@ -238,6 +246,15 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
                     existing_run_results.save()
                 except:
                     return Response({'error': 'Model Failed to retrieve status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            if max_age > 0:
+                now = datetime.utcnow().replace(tzinfo=utc)
+                # use only the 
+                now = now.timetuple()[:3]
+                max_time = existing_run_results.timestamp + \
+                    timedelta(days=max_age)
+                if now > max_time:
+                    return Response({'error': 'No model within this timeframe found'}, status=status.HTTP_404_NOT_FOUND)
             serializer = self.get_serializer(existing_run_results)
             return Response(serializer.data)
         except:
@@ -256,6 +273,24 @@ class HashResourceAPIView(APIView):
 
     def post(self, request, format=None):
         serializer = HashValueSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class HashFileAPIView(APIView):
+    """
+    A simple ViewSet for viewing and posting hashvalues in the database.
+    """
+
+    def get(self, request, format=None):
+        queryset = HashFile.objects.all().order_by('id')
+        serializer = HashFileSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = HashFileSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

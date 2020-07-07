@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import State, County, SimulationRun, HashValue
+from .models import State, County, SimulationRun, HashValue, HashFile
 
 admin.site.register(State)
 
@@ -18,3 +18,5 @@ admin.site.register(County, CountyAdmin)
 admin.site.register(SimulationRun)
 
 admin.site.register(HashValue)
+
+admin.site.register(HashFile)

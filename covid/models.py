@@ -5,6 +5,7 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
 
 
 class State(models.Model):
@@ -103,3 +104,17 @@ class HashValue(models.Model):
     def create(cls, hash, time):
         new_hash = cls(hash_value=hash, timestamp=time)
         return new_hash
+
+
+class HashFile(models.Model):
+    file = models.FileField(upload_to='hash_files/')
+
+    class Meta:
+        verbose_name = _("Hash File")
+        verbose_name_plural = _("Hash Files")
+
+    def __str__(self):
+        return "{}".format(self.file)
+
+    def get_absolute_url(self):
+        return reverse("HashFile_detail", kwargs={"pk": self.pk})
