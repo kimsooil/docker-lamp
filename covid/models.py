@@ -13,18 +13,15 @@ class State(models.Model):
     abbreviation = models.CharField(_("Abbreviation"), max_length=50)
     country = models.CharField(_("Country"), max_length=50)
     # TODO possibly replace Postgres field with relation field
-    default_counties = ArrayField(models.CharField(_("County Name"), max_length=80), size=10,
+    default_counties = ArrayField(models.CharField(_("County Name"), max_length=80), size=16,
                                   help_text=_("Default Counties"))
     shelter_date = models.DateField(_("Shelter Date"))
     shelter_release_start_date = models.DateField(
         _("Shelter Release Start Date"))
     shelter_release_end_date = models.DateField(_("Shelter Release End Date"))
-    social_distancing = models.BooleanField(
-        _("Social Distancing"), default=True)
-    social_distancing_end_date = models.DateField(
-        _("Social Distancing End Date"))
-    quarantine_percent = models.PositiveSmallIntegerField(
-        _("Percentage Quarantined"), default=0)
+    social_distancing = models.BooleanField(_("Social Distancing"), default=False)
+    social_distancing_end_date = models.DateField(_("Social Distancing End Date"))
+    quarantine_percent = models.PositiveSmallIntegerField(_("Percentage Quarantined"), default=0)
     quarantine_start_date = models.DateField(_("Quarantine Start Date"))
 
     class Meta:
