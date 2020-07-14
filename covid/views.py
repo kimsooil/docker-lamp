@@ -219,10 +219,11 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         for key, val in model_input_vals.items():
             if key != 'county':
                 model_input_vals[key] = val[0]
-        # convert quarantine percent to number
-        # did we change this to a string??? or is it still an int
-        # model_input_vals['quarantine_percent'] = int(
-        #     model_input_vals['quarantine_percent'])
+        # convert quarantine percent to int and social_distancing to bool
+        model_input_vals['quarantine_percent'] = int(
+            model_input_vals['quarantine_percent'])
+        model_input_vals['social_distancing'] = bool(
+            model_input_vals['social_distancing'])
 
         # get the max age of the model input and remove from model input
         if 'max_age' in model_input_vals:
@@ -260,7 +261,7 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
                     if now > max_time:
                         return Response({'error': 'No model within this timeframe found'}, status=status.HTTP_404_NOT_FOUND)
                 serializer = self.get_serializer(existing_run_results)
-                return Response(serializer.data)
+                return Response(serializer.data['model_output'])
             except:
                 # max_age == 0 indicates only the current hash is acceptable, no second chance
                 if max_age == 0:
