@@ -25,7 +25,7 @@ def remove_current_dir(path):
         shutil.rmtree(path)
 
 
-def remove_files_from_db():
+def remove_files():
     """ 
     Removes all current hash files from the database
     """
@@ -46,12 +46,14 @@ def download_precomputes(self, data_hash):
     # if hash not already in database
     try:
         HashValue.objects.get(hash_value=data_hash)
+        self.stdout.write(
+            "Most recent hash and associated files have already been added.")
         return 1
     except HashValue.DoesNotExist:
         # ensure that model files exist to ensure this is a valid hash
         resp = requests.get(model_base_location + data_hash + '/' +
                             model_file_list)
-        # str_resp = str(resp)
+
         # failed or succeeded
         if resp.status_code == 400:
             self.stdout.write("No data available")
@@ -59,12 +61,10 @@ def download_precomputes(self, data_hash):
         elif resp.status_code == 200:
             self.stdout.write("Data is available")
             # remove all current files from db
-            remove_files_from_db()
+            remove_files()
             # remove output folder to replace with new content
             remove_current_dir('app/hash_files/output')
-            # if os.path.exists('app/hash_files/output'):
-            #     shutil.rmtree('app/hash_files/output')
-
+          
             path = model_local+'/'+model_file_list
             hash_file = create_save_hash_file(resp.text, path)
 
@@ -82,36 +82,17 @@ def download_precomputes(self, data_hash):
                 if 'model_' not in files[0]:
                     self.stdout.write("no data available")
 
-                    # remove file
-                    os.remove(hash_file_obj)
-
                     # flag
                     files_listed = False
 
                     # return
                     return -1
 
-            # process data if files
-            count_files = 0
+            # data is available
+            # do not need to download
             if files_listed:
-                # loop through files
-                for file_name in files:
-                    # dont get files list
-                    if file_name != 'model_files.txt':
-                        count_files = count_files + 1
-                        # get json files
-                        resp = requests.get(model_base_location + data_hash + '/' +
-                                            file_name)
-                        # save the file
-                        path = model_local+'/'+file_name
-                        create_save_hash_file(resp.text, path)
-
-                # print success
-                self.stdout.write("Downloaded " + data_hash + ", " +
-                                  str(count_files) + " files.")
-                # return
                 return 0
-                # return 1
+
 
 
 def download_inputs(self, data_hash):
@@ -227,20 +208,18 @@ class Command(BaseCommand):
                                             "Adding Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'])
 
                                         try:
-                                            # create hash
+                                            # create and save hash
                                             new_hash = HashValue.create(data_point['sha'],
                                                                         data_point['commit']['committer']['date'])
                                             self.stdout.write(
                                                 "Created Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'])
-                                            # save hash
                                             new_hash.save()
                                             self.stdout.write(
                                                 "Saved Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'] + " to database.")
                                         except:
                                             self.stdout.write(
                                                 "Failed to add hash (could already exist): "+data_point['sha'])
-                                        # self.stdout.write(
-                                        #     "Should have added hash: " + data_point['sha'])
+                                        # only add most recent hash
                                         previously_added = True
                                         download_inputs(
                                             self, data_point['sha'])
@@ -250,8 +229,6 @@ class Command(BaseCommand):
                                         previously_added = True
 
                                 break  # need to exit as ordered in time
-                    # remove this
-                        # break
 
             else:
                 self.stdout.write("Hourly API rate limit exceeded!")

@@ -21,6 +21,7 @@ from django.db import models
 # from urls import urlpatterns
 import boto3
 import time
+import re
 import urllib.parse
 from datetime import datetime, timedelta
 from django.utils.timezone import utc
@@ -219,8 +220,10 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             if key != 'county':
                 model_input_vals[key] = val[0]
         # convert quarantine percent to number
-        model_input_vals['quarantine_percent'] = int(
-            model_input_vals['quarantine_percent'])
+        # did we change this to a string??? or is it still an int
+        # model_input_vals['quarantine_percent'] = int(
+        #     model_input_vals['quarantine_percent'])
+        
         # get the max age of the model input and remove from model input
         if 'max_age' in model_input_vals:
             max_age = int(model_input_vals['max_age'])
@@ -229,36 +232,43 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             max_age = -1
         model_input_dict = {'model_input': model_input_vals}
 
-        # latest_hash = HashValue.objects.all().order_by(
-        #     '-timestamp')[0].hash_value
-        # model_input_dict['model_input'].update({'data_hash': latest_hash})
+        # get all available hashes
+        hash_queryset = HashValue.objects.all().order_by('-timestamp')
 
-        # look for existing run if exists
-        try:
-            existing_run_results = SimulationRun.objects.get(
-                model_input=model_input_dict['model_input'])
+        # check for model inputs with every hash until one is found. The hashes after will contain older data
+        for hash in hash_queryset:
+            model_input_dict['model_input'].update(
+                {'data_hash': hash.hash_value})
+            # try to find existing runs with hash values
+            try:
+                existing_run_results = SimulationRun.objects.get(
+                    model_input=model_input_dict['model_input'])
+                # update model output if onboard compute
+                if existing_run_results.capacity_provider == 'onboard' and (existing_run_results.model_output == None or existing_run_results.model_output['status'] != 'complete'):
+                    model_runner = OnboardCompute(
+                        existing_run_results.model_input)
+                    try:
+                        existing_run_results.model_output = model_runner.status()
+                        existing_run_results.save()
+                    except:
+                        return Response({'error': 'Model failed to retrieve status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                # check timeframe if given maximum time for data
+                if max_age > 0:
+                    now = datetime.utcnow().replace(tzinfo=utc)
+                    max_time = existing_run_results.timestamp + \
+                        timedelta(days=max_age)
+                    if now > max_time:
+                        return Response({'error': 'No model within this timeframe found'}, status=status.HTTP_404_NOT_FOUND)
+                serializer = self.get_serializer(existing_run_results)
+                return Response(serializer.data)
+            except:
+                # max_age == 0 indicates only the current hash is acceptable, no second chance
+                if max_age == 0:
+                    return Response({'error': 'Model does not exist with current hash'}, status=status.HTTP_404_NOT_FOUND)
+                pass
 
-            # check onboard and not finsihed, update if so
-            if existing_run_results.capacity_provider == 'onboard' and (existing_run_results.model_output == None or existing_run_results.model_output['status'] != 'complete'):
-                model_runner = OnboardCompute(existing_run_results.model_input)
-                try:
-                    existing_run_results.model_output = model_runner.status()
-                    existing_run_results.save()
-                except:
-                    return Response({'error': 'Model Failed to retrieve status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-            if max_age > 0:
-                now = datetime.utcnow().replace(tzinfo=utc)
-                # use only the 
-                now = now.timetuple()[:3]
-                max_time = existing_run_results.timestamp + \
-                    timedelta(days=max_age)
-                if now > max_time:
-                    return Response({'error': 'No model within this timeframe found'}, status=status.HTTP_404_NOT_FOUND)
-            serializer = self.get_serializer(existing_run_results)
-            return Response(serializer.data)
-        except:
-            return Response({'error': 'Model Does Not Exist'}, status=status.HTTP_404_NOT_FOUND)
+        # no model with any existing hashes
+        return Response({'error': 'Model does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class HashResourceAPIView(APIView):

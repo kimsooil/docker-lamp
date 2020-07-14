@@ -7,6 +7,8 @@ volumes:
     volume_django_media:        # Store the Django media files. Volume is shared between djangoweb and nginx.
     volume_django_static:       # Store the Django static files. Volume is shared between djangoweb and nginx.
     volume_model:
+    volume_django_hash_input:
+    volume_django_hash_output:
 services:
     # Test send/receive email. 
     mailhog:
@@ -44,6 +46,8 @@ services:
             - .:/app/
             - volume_django_static:/var/staticfiles
             - volume_django_media:/var/mediafiles
+            - volume_django_hash_input:/app/hash_files/input/
+            - volume_django_hash_output:/app/hash_files/output/
         ports: # IMPORTANT: Make sure to use 127.0.0.1 to keep it local. Otherwise, this will be broadcast to the web.
             - 127.0.0.1:8000:8000
         depends_on:
@@ -72,6 +76,7 @@ services:
             - AWS_ACCESS_KEY_ID
             - AWS_STORAGE_BUCKET_NAME
             - AWS_REGION_NAME
+            - DJANGO_API_DEFAULT_SIM_LENGTH
         links:
             - "postgresdb"
     model:
