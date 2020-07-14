@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
-from .views import CountyResourcesAPIView, SimulationRunViewSet, HashResourceAPIView, HashFileAPIView
+from .views import CountyResourcesAPIView, SimulationRunViewSet, HashResourceAPIView, HashFileAPIView, StateCountyAPIView
 
 router = routers.SimpleRouter()
 router.register(r'api/simulations', SimulationRunViewSet,
@@ -23,6 +23,11 @@ urlpatterns = [
         HashFileAPIView.as_view(),
         name="hash_files"
     ),
+    path(
+        'api/get_states_counties/',
+        StateCountyAPIView.as_view(),
+        name="get_states_counties"
+    )
 ]
 
 urlpatterns += router.urls

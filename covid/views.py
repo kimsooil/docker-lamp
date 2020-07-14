@@ -1,5 +1,6 @@
 import requests
 import json
+import csv
 
 from oauth2_provider.views.generic import ProtectedResourceView
 from rest_framework import status, viewsets
@@ -21,7 +22,6 @@ from django.db import models
 # from urls import urlpatterns
 import boto3
 import time
-import re
 import urllib.parse
 from datetime import datetime, timedelta
 from django.utils.timezone import utc
@@ -223,7 +223,7 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         # did we change this to a string??? or is it still an int
         # model_input_vals['quarantine_percent'] = int(
         #     model_input_vals['quarantine_percent'])
-        
+
         # get the max age of the model input and remove from model input
         if 'max_age' in model_input_vals:
             max_age = int(model_input_vals['max_age'])
@@ -305,3 +305,56 @@ class HashFileAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class StateCountyAPIView(APIView):
+    """
+    A simple get API View to return all the states and their respected counties
+    """
+
+    def get(self, request, format=None):
+        confirmed_filename = 'time_series_covid19_confirmed_US.csv'
+        base_folder = 'app/hash_files/input/'
+
+        # filters for extra data in JH dataset
+        state_filter = ['Diamond Princess', 'Grand Princess']
+        county_filter = ['Out of ', 'Unassigned']
+
+        # store states and their counties
+        states = []
+        counties = {}
+
+        # try and get data
+        try:
+            # loop through data
+            with open(base_folder + confirmed_filename) as csvfile:
+                spamreader = csv.reader(csvfile)
+                # skip headers
+                next(spamreader)
+
+                # get every row
+                for row in spamreader:
+                    # reject non states
+                    if row[6] in state_filter:
+                        continue
+
+                    # add new state
+                    if row[6] not in states:
+                        states.append(row[6])
+                        counties[row[6]] = []
+
+                    # add counties to states
+                    save_county = True
+                    for cfilt in county_filter:
+                        if cfilt in row[5]:
+                            save_county = False
+
+                    # add
+                    if save_county:
+                        counties[row[6]].append(row[5])
+
+            # return results
+            return Response({"states": states, "counties": counties}, status=status.HTTP_201_CREATED)
+
+        except:
+            return Response({"states": "None", "counties": "None"}, status=status.HTTP_400_BAD_REQUEST)
