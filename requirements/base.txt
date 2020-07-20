@@ -8,3 +8,5 @@ django-crispy-forms
 django-cors-headers
 django-environ
 django-oauth-toolkit
+boto3
+django-storages
