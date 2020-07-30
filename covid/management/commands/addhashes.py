@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import ContentFile
 from covid.models import HashValue, HashFile
 import requests
@@ -142,6 +143,7 @@ class Command(BaseCommand):
                 hash.delete()
             self.stdout.write("deleted all hashes")
         else:
+            self.stdout.write("Starting the script")
             confirmed_filename = 'time_series_covid19_confirmed_US.csv'
             # dont beleive this is necessary anymore
             try:
@@ -168,6 +170,7 @@ class Command(BaseCommand):
             # data is a list if we get commit data
             if isinstance(data, list):
                 # run through commits to see if there is a new one with our data
+                previously_added = False
                 for data_point in data:
                     # only check commits with message "automated update"
                     if data_point['commit']['message'] == "automated update":
@@ -195,40 +198,45 @@ class Command(BaseCommand):
                         for file in commit_data['files']:
                             if confirmed_filename in file['filename']:
                                 # is the commit newer?
-                                if commmit_date > current_time:
+                                # add data_point['sha'] to database with timestamp
+                                # if hash not currently in database
+                                self.stdout.write(
+                                    "Adding Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'])
 
-                                    ret = download_precomputes(
-                                        self, data_point['sha'])
+                                try: 
+                                    HashValue.objects.get(hash_value=data_point['sha'])
+                                    self.stdout.write(
+                                        "Hash already exists: "+data_point['sha'])
+                                except ObjectDoesNotExist:
 
-                                    # if downloaded add hash
-                                    if ret == 0:
-                                        # add data_point['sha'] to database with timestamp
-                                        # if hash not currently in database
-                                        self.stdout.write(
-                                            "Adding Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'])
+                                    new_hash = HashValue.create(data_point['sha'],
+                                                                data_point['commit']['committer']['date'])
+                                    
+                                    self.stdout.write(
+                                        "Created Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'])
 
-                                        try:
-                                            # create and save hash
-                                            new_hash = HashValue.create(data_point['sha'],
-                                                                        data_point['commit']['committer']['date'])
-                                            self.stdout.write(
-                                                "Created Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'])
-                                            new_hash.save()
-                                            self.stdout.write(
-                                                "Saved Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'] + " to database.")
-                                        except:
-                                            self.stdout.write(
-                                                "Failed to add hash (could already exist): "+data_point['sha'])
-                                        # only add most recent hash
+                                    confirmed_filename = 'time_series_covid19_confirmed_US.csv'
+                                    deaths_filename = 'time_series_covid19_deaths_US.csv'
+                                    base_address = 'http://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/'
+
+                                    resp_conf = requests.get(base_address + confirmed_filename)
+                                    confirmed_file_content = ContentFile(resp_conf.text)
+                                    new_hash.timeseries_confirmed.save(confirmed_filename, confirmed_file_content)
+
+
+                                    resp_death = requests.get(base_address + deaths_filename)
+                                    deaths_file_content = ContentFile(resp_conf.text)
+                                    new_hash.timeseries_deaths.save(deaths_filename, deaths_file_content)
+
+                                    new_hash.save()
+                                    self.stdout.write(
+                                        "Saved Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'] + " to database.")
+
+                                    if not options['all']:
                                         previously_added = True
-                                        download_inputs(
-                                            self, data_point['sha'])
-                                    # used only if you have existing hashes in db and only want most recent to be added
-                                    elif not options['all'] and ret == 1:
-                                        # this has already been added and so have all after (timeordered)
-                                        previously_added = True
-
-                                break  # need to exit as ordered in time
-
+                                    
+                                    break
+                    if previously_added:
+                        break                
             else:
                 self.stdout.write("Hourly API rate limit exceeded!")

@@ -62,7 +62,7 @@ AWS_SECRET_ACCESS_KEY_ID = ENV.str('AWS_SECRET_ACCESS_KEY_ID', default='')
 AWS_STORAGE_BUCKET_NAME = ENV.str('AWS_STORAGE_BUCKET_NAME', default='')
 AWS_REGION_NAME = ENV.str('AWS_REGION_NAME', default='')
 # Set root for gh files
-MEDIA_ROOT = 'app/'
-MEDIA_URL = '/'
+# MEDIA_ROOT = 'app/'
+# MEDIA_URL = '/'
 # Override token expiration period. Access token will expire after 90 days.
 OAUTH2_PROVIDER['ACCESS_TOKEN_EXPIRE_SECONDS'] = 7776000

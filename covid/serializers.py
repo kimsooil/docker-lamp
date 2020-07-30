@@ -19,7 +19,7 @@ class SimulationRunSerializer(serializers.ModelSerializer):
 class HashValueSerializer(serializers.ModelSerializer):
     class Meta:
         model = HashValue
-        fields = ['id', 'timestamp', 'hash_value', ]
+        fields = ['id', 'timestamp', 'hash_value', 'timeseries_confirmed', 'timeseries_deaths' ]
 
 
 class HashFileSerializer(serializers.ModelSerializer):

@@ -281,7 +281,7 @@ class HashResourceAPIView(APIView):
 
     def get(self, request, format=None):
         queryset = HashValue.objects.all().order_by('id')
-        serializer = HashValueSerializer(queryset, many=True)
+        serializer = HashValueSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
     def post(self, request, format=None):

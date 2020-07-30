@@ -86,6 +86,8 @@ class HashValue(models.Model):
                                   null=False, blank=False)
     timestamp = models.DateTimeField(
         _("Timestamp"), auto_now=False, auto_now_add=False)
+    timeseries_confirmed = models.FileField(_("Confirmed JH Timeseries"), upload_to='jh_data/%Y/%m/%d/', max_length=100, null=True)
+    timeseries_deaths = models.FileField(_("Deaths JH Timeseries"), upload_to='jh_data/%Y/%m/%d/', max_length=100, null=True)
 
     class Meta:
         verbose_name = _("Hash Value")
