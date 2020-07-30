@@ -281,6 +281,9 @@ class HashResourceAPIView(APIView):
 
     def get(self, request, format=None):
         queryset = HashValue.objects.all().order_by('id')
+        hash_value = request.query_params.get('hash_value', None)
+        if hash_value is not None:
+            queryset = queryset.filter(hash_value=hash_value)
         serializer = HashValueSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
