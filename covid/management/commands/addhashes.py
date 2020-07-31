@@ -65,7 +65,7 @@ def download_precomputes(self, data_hash):
             remove_files()
             # remove output folder to replace with new content
             remove_current_dir('app/hash_files/output')
-          
+
             path = model_local+'/'+model_file_list
             hash_file = create_save_hash_file(resp.text, path)
 
@@ -93,7 +93,6 @@ def download_precomputes(self, data_hash):
             # do not need to download
             if files_listed:
                 return 0
-
 
 
 def download_inputs(self, data_hash):
@@ -203,15 +202,16 @@ class Command(BaseCommand):
                                 self.stdout.write(
                                     "Adding Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'])
 
-                                try: 
-                                    HashValue.objects.get(hash_value=data_point['sha'])
+                                try:
+                                    HashValue.objects.get(
+                                        hash_value=data_point['sha'])
                                     self.stdout.write(
                                         "Hash already exists: "+data_point['sha'])
                                 except ObjectDoesNotExist:
 
                                     new_hash = HashValue.create(data_point['sha'],
                                                                 data_point['commit']['committer']['date'])
-                                    
+
                                     self.stdout.write(
                                         "Created Hash: "+data_point['sha'] + " with time: "+data_point['commit']['committer']['date'])
 
@@ -219,14 +219,19 @@ class Command(BaseCommand):
                                     deaths_filename = 'time_series_covid19_deaths_US.csv'
                                     base_address = 'http://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/'
 
-                                    resp_conf = requests.get(base_address + confirmed_filename)
-                                    confirmed_file_content = ContentFile(resp_conf.text)
-                                    new_hash.timeseries_confirmed.save(confirmed_filename, confirmed_file_content)
+                                    resp_conf = requests.get(
+                                        base_address + confirmed_filename)
+                                    confirmed_file_content = ContentFile(
+                                        resp_conf.text)
+                                    new_hash.timeseries_confirmed.save(
+                                        confirmed_filename, confirmed_file_content)
 
-
-                                    resp_death = requests.get(base_address + deaths_filename)
-                                    deaths_file_content = ContentFile(resp_conf.text)
-                                    new_hash.timeseries_deaths.save(deaths_filename, deaths_file_content)
+                                    resp_death = requests.get(
+                                        base_address + deaths_filename)
+                                    deaths_file_content = ContentFile(
+                                        resp_death.text)
+                                    new_hash.timeseries_deaths.save(
+                                        deaths_filename, deaths_file_content)
 
                                     new_hash.save()
                                     self.stdout.write(
@@ -234,9 +239,9 @@ class Command(BaseCommand):
 
                                     if not options['all']:
                                         previously_added = True
-                                    
+
                                     break
                     if previously_added:
-                        break                
+                        break
             else:
                 self.stdout.write("Hourly API rate limit exceeded!")
