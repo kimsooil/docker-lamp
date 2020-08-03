@@ -284,7 +284,8 @@ class HashResourceAPIView(APIView):
         hash_value = request.query_params.get('hash_value', None)
         if hash_value is not None:
             queryset = queryset.filter(hash_value=hash_value)
-        serializer = HashValueSerializer(queryset, many=True, context={'request': request})
+        serializer = HashValueSerializer(
+            queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
     def post(self, request, format=None):
@@ -319,8 +320,8 @@ class StateCountyAPIView(APIView):
     """
 
     def get(self, request, format=None):
-        confirmed_filename = 'time_series_covid19_confirmed_US.csv'
-        base_folder = 'app/hash_files/input/'
+        confirmed_filename = HashValue.objects.all().order_by(
+            '-timestamp')[0].timeseries_confirmed.path
 
         # filters for extra data in JH dataset
         state_filter = ['Diamond Princess', 'Grand Princess']
@@ -333,13 +334,14 @@ class StateCountyAPIView(APIView):
         # try and get data
         try:
             # loop through data
-            with open(base_folder + confirmed_filename) as csvfile:
+            with open(confirmed_filename) as csvfile:
                 spamreader = csv.reader(csvfile)
                 # skip headers
                 next(spamreader)
 
                 # get every row
                 for row in spamreader:
+                    # print("test")
                     # reject non states
                     if row[6] in state_filter:
                         continue
