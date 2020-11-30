@@ -116,6 +116,7 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             url_path='webhook', url_name='webhook')
     def handle_webhook(self, request, pk=None):
         sim_run = self.get_object()
+        print(request.data)
         # validate webhook
         if str(sim_run.webhook_token) == request.data['webhook_token']:
             if not request.data.get('output'):
@@ -203,9 +204,9 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         elif user_cp.groups.filter(name='Onboard Compute').exists():
             serializer.validated_data.update(
                 {'capacity_provider': 'onboard'})
-        else:
+        else:# Azure
             serializer.validated_data.update(
-                {'capacity_provider': 'FARGATE'})
+                {'capacity_provider': 'AZURE'})
         obj = serializer.save(user=user)
 
         return obj

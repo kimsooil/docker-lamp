@@ -172,8 +172,7 @@ class Command(BaseCommand):
                 previously_added = False
                 for data_point in data:
                     # only check commits with message "automated update"
-                    if data_point['commit']['message'] == "automated update":
-
+                    if data_point['commit']['message'].lower() == "automated update":
                         # break if we hit hash in database already, rest will already be added
                         # only used if --all NOT specified
                         if previously_added == True:

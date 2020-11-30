@@ -3,6 +3,7 @@ from datetime import datetime
 import boto3
 import urllib
 import requests
+from requests.exceptions import HTTPError
 
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
@@ -35,6 +36,8 @@ class ModelRunner:
         self.s3_object = self.createS3Object()
 
     def submit(self):
+        print('---------------------------------')
+        print(self.capacity_provider)
         # submit job depending on capacity provider
         # fargate and spot submit are called in the initialization of the object
         # onboard submit needs to be called explicitly, as it is created to get status as well
@@ -43,6 +46,9 @@ class ModelRunner:
             response = model.submit()
         elif self.capacity_provider == 'FARGATE_SPOT':
             model = FargateSpot(self.s3_object)
+            response = model.submit()
+        elif self.capacity_provider == 'AZURE':
+            model = Azure(self.s3_object)
             response = model.submit()
         elif self.capacity_provider == 'onboard':
             model = OnboardCompute(self.model_input)
@@ -114,6 +120,65 @@ class FargateSpot(ModelRunner):
             return Response({'success': 'Started model'}, status=status.HTTP_200_OK)
         except:
             return {'error': 'Failed to upload object to s3 - spot'}
+
+
+class Azure(ModelRunner):
+    """
+    Subclass of ModelRunner to submit a Azure Spot job with no progress to webhook
+    """
+
+    def __init__(self, az_data):
+        self.az_data = az_data
+
+    def submit(self):
+        # your json payload that contains the environment variables i.e. country, state, etc.
+        self.az_data['webhook_url'] = self.az_data['webhook_url'].replace('http://localhost:8000', 'https://54e020a9c6bd.ngrok.io')
+        # self.az_data['hash'] = self.az_data['model_input']['data_hash']
+        az_data_object = self.az_data
+        az_data_object['model_output'] = ""
+        # for item in az_data_object['model_input'].keys():
+        #     az_data_object[item] = az_data_object['model_input'][item]
+        # az_data_object['hash'] = az_data_object['data_hash']
+        # az_data_object['model_input'] = {}
+        az_data = str(json.dumps(az_data_object))
+
+        # add timestamp as object name for anything uploaded to S3
+        key_name = datetime.now().strftime(
+            "%Y%m%d-%H%M%S.%f"
+        )[:-3] + "-ndcovid.json"
+
+        # URL to REST endpoint
+
+        uri = "https://siercast.azurewebsites.net/<function_name_here>"
+        uri = "https://seircast.azurewebsites.net/api/RequestSim"
+
+        # the x-functions-key header is your token
+        headers = {
+            'content-type': "application/json",
+            'x-functions-key': "axYIQEzE0IpHDcGEU6ztLUufXvjgNjRUs59qzyVFu01deQZgROJ3jA=="
+        }
+
+        # you will receive a 202 and a message stating that the request was successfully received
+        # try:
+        # response = requests.post(uri, data=az_data, headers=headers)
+        # except HTTPError as err:
+        #     print(err)
+        #     print(response)
+        #     print(response.status_code)
+
+        print(json.dumps(az_data_object, indent=3))
+        response = requests.post(uri, data=az_data, headers=headers)
+        print(response)
+        print(response.status_code)
+        print(response.content)
+        print(response.text)
+
+        return Response({'success': 'Started model'}, status=status.HTTP_200_OK)
+        # try:
+        #     response = requests.post(uri, data=az_data, headers=headers)
+        #     return Response({'success': 'Started model'}, status=status.HTTP_200_OK)
+        # except:
+        #     return {'error': 'Failed to upload object to azure'}
 
 
 class OnboardCompute(ModelRunner):
