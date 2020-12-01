@@ -136,8 +136,8 @@ class Azure(ModelRunner):
         # self.az_data['hash'] = self.az_data['model_input']['data_hash']
         az_data_object = self.az_data
         az_data_object['model_output'] = ""
-        # for item in az_data_object['model_input'].keys():
-        #     az_data_object[item] = az_data_object['model_input'][item]
+        for item in az_data_object['model_input'].keys():
+            az_data_object[item] = az_data_object['model_input'][item]
         # az_data_object['hash'] = az_data_object['data_hash']
         # az_data_object['model_input'] = {}
         az_data = str(json.dumps(az_data_object))
