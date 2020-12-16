@@ -139,16 +139,31 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         # retrieve latest hash value
         latest_hash = HashValue.objects.all().order_by(
-            '-timestamp')[0].hash_value
+            '-timestamp'
+        )[0].hash_value
+
         model_input_dict = request.data
         model_input_dict['model_input'].update({'data_hash': latest_hash})
+
+        # sorted_keys = sorted(model_input_dict['model_input'])
+        # new_model_input_dict = {}
+
+        # for key in sorted_keys:
+        #     new_model_input_dict[key] = model_input_dict['model_input'][key]
+
+        # new_model_input_dict['county'] = sorted(new_model_input_dict['county'])
+        # model_input_dict['model_input'] = new_model_input_dict
+
         # look for existing run with same inputs
         serializer = SimulationRunSerializer(
-            data=model_input_dict)
+            data=model_input_dict
+        )
         try:
             # get existing run
             existing_run_results = SimulationRun.objects.get(
-                model_input=model_input_dict['model_input'])
+                model_input=model_input_dict['model_input']
+            )
+
             # check onboard and not finsihed
             if existing_run_results.capacity_provider == 'onboard' and (existing_run_results.model_output == None or existing_run_results.model_output['status'] != 'complete'):
                 # create onboard model runner to check for status

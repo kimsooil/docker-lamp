@@ -149,36 +149,26 @@ class Azure(ModelRunner):
 
         # URL to REST endpoint
 
-        uri = "https://siercast.azurewebsites.net/<function_name_here>"
-        uri = "https://seircast.azurewebsites.net/api/RequestSim"
+        uri = settings.AZURE_URI
 
         # the x-functions-key header is your token
         headers = {
             'content-type': "application/json",
-            'x-functions-key': "axYIQEzE0IpHDcGEU6ztLUufXvjgNjRUs59qzyVFu01deQZgROJ3jA=="
+            'x-functions-key': settings.AZURE_FUNCTION_KEY
         }
 
-        # you will receive a 202 and a message stating that the request was successfully received
-        # try:
-        # response = requests.post(uri, data=az_data, headers=headers)
-        # except HTTPError as err:
-        #     print(err)
-        #     print(response)
-        #     print(response.status_code)
+        print(headers)
+        print(uri)
 
-        print(json.dumps(az_data_object, indent=3))
-        response = requests.post(uri, data=az_data, headers=headers)
-        print(response)
-        print(response.status_code)
-        print(response.content)
-        print(response.text)
+        try:
+            response = requests.post(uri, data=az_data, headers=headers)
+            print(response.status_code)
+            if not response.status_code:
+                raise Exception
 
-        return Response({'success': 'Started model'}, status=status.HTTP_200_OK)
-        # try:
-        #     response = requests.post(uri, data=az_data, headers=headers)
-        #     return Response({'success': 'Started model'}, status=status.HTTP_200_OK)
-        # except:
-        #     return {'error': 'Failed to upload object to azure'}
+            return Response({'success': 'Started model'}, status=status.HTTP_200_OK)
+        except Exception:
+            return {'error': 'Failed to upload object to azure'}
 
 
 class OnboardCompute(ModelRunner):
