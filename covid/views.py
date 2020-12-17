@@ -137,29 +137,22 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             return Response({'status': 'invalid webhook token'}, status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
-        # retrieve latest hash value
+        # Retrieve latest hash value.
         latest_hash = HashValue.objects.all().order_by(
             '-timestamp'
         )[0].hash_value
 
+        # Get the request data and add the latest hash.
         model_input_dict = request.data
         model_input_dict['model_input'].update({'data_hash': latest_hash})
 
-        # sorted_keys = sorted(model_input_dict['model_input'])
-        # new_model_input_dict = {}
-
-        # for key in sorted_keys:
-        #     new_model_input_dict[key] = model_input_dict['model_input'][key]
-
-        # new_model_input_dict['county'] = sorted(new_model_input_dict['county'])
-        # model_input_dict['model_input'] = new_model_input_dict
-
-        # look for existing run with same inputs
+        # Set serializer with the input data.
         serializer = SimulationRunSerializer(
             data=model_input_dict
         )
+
         try:
-            # get existing run
+            # Check for existing run based on the input.
             existing_run_results = SimulationRun.objects.get(
                 model_input=model_input_dict['model_input']
             )
@@ -175,9 +168,9 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
                 except:
                     return Response({'error': 'Model Failed to retreive status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            # If a run failed.
-            if existing_run_results.model_output == None or existing_run_results.model_output == 'null':
-                return Response({'error': 'Model failed to retrieve status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # # If we don't have any data in 'model_output', then we exit with error.
+            # if existing_run_results.model_output == None or existing_run_results.model_output == 'null':
+            #     return Response({'error': 'Model failed to retrieve status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             now = datetime.utcnow().replace(tzinfo=utc)
             max_time = existing_run_results.timestamp+timedelta(hours=1)
@@ -218,14 +211,11 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         if user_cp.groups.filter(name='Fargate').exists():
             serializer.validated_data.update({'capacity_provider': 'FARGATE'})
         elif user_cp.groups.filter(name='Fargate Spot').exists():
-            serializer.validated_data.update(
-                {'capacity_provider': 'FARGATE_SPOT'})
+            serializer.validated_data.update({'capacity_provider': 'FARGATE_SPOT'})
         elif user_cp.groups.filter(name='Onboard Compute').exists():
-            serializer.validated_data.update(
-                {'capacity_provider': 'onboard'})
+            serializer.validated_data.update({'capacity_provider': 'onboard'})
         else:# Azure
-            serializer.validated_data.update(
-                {'capacity_provider': 'AZURE'})
+            serializer.validated_data.update({'capacity_provider': 'AZURE'})
         obj = serializer.save(user=user)
 
         return obj
@@ -239,13 +229,6 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         for key, val in model_input_vals.items():
             if key != 'county':
                 model_input_vals[key] = val[0]
-        # convert quarantine percent to int and social_distancing to bool
-        # model_input_vals['quarantine_percent'] = int(
-        #     model_input_vals['quarantine_percent'])
-        # if model_input_vals['social_distancing'] == 'false':
-        #     model_input_vals['social_distancing'] = False
-        # else:
-        #     model_input_vals['social_distancing'] = True
 
         # get the max age of the model input and remove from model input
         if 'max_age' in model_input_vals:
@@ -273,31 +256,31 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
 
                 # update model output if onboard compute
                 if existing_run_results.capacity_provider == 'onboard' and (existing_run_results.model_output == None or existing_run_results.model_output['status'] != 'complete'):
-                    model_runner = OnboardCompute(
-                        existing_run_results.model_input)
+                    model_runner = OnboardCompute(existing_run_results.model_input)
                     try:
                         existing_run_results.model_output = model_runner.status()
                         existing_run_results.save()
                     except:
                         return Response({'error': 'Model failed to retrieve status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-                # If a run failed.
-                if existing_run_results.model_output == None or existing_run_results.model_output == 'null':
+                # If a run failed for not an onboard.
+                if existing_run_results.model_output == None:
                     return Response({'error': 'Model failed to retrieve status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
                 # check timeframe if given maximum time for data
                 if max_age > 0:
                     now = datetime.utcnow().replace(tzinfo=utc)
-                    max_time = existing_run_results.timestamp + \
-                        timedelta(days=max_age)
+                    max_time = existing_run_results.timestamp + timedelta(days=max_age)
                     if now > max_time:
                         return Response({'error': 'No model within this timeframe found'}, status=status.HTTP_404_NOT_FOUND)
+
                 serializer = self.get_serializer(existing_run_results)
                 return Response(serializer.data['model_output'])
             except:
                 # max_age == 0 indicates only the current hash is acceptable, no second chance
                 if max_age == 0:
                     return Response({'error': 'Model does not exist with current hash'}, status=status.HTTP_404_NOT_FOUND)
+
                 pass
 
         # no model with any existing hashes
