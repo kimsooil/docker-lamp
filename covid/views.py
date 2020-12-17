@@ -175,6 +175,10 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
                 except:
                     return Response({'error': 'Model Failed to retreive status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+            # If a run failed.
+            if existing_run_results.model_output == None or existing_run_results.model_output == 'null':
+                return Response({'error': 'Model failed to retrieve status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
             now = datetime.utcnow().replace(tzinfo=utc)
             max_time = existing_run_results.timestamp+timedelta(hours=1)
             # check to ensure model has returned results within 1 hour, exception resubmits the job after deletion
@@ -250,18 +254,23 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         else:
             max_age = -1
         model_input_dict = {'model_input': model_input_vals}
+        # print(json.dumps(model_input_dict, indent=3))
 
         # get all available hashes
         hash_queryset = HashValue.objects.all().order_by('-timestamp')
 
         # check for model inputs with every hash until one is found. The hashes after will contain older data
         for hash in hash_queryset:
-            model_input_dict['model_input'].update(
-                {'data_hash': hash.hash_value})
+            model_input_dict['model_input'].update({
+                'data_hash': hash.hash_value
+            })
+
             # try to find existing runs with hash values
             try:
                 existing_run_results = SimulationRun.objects.get(
-                    model_input=model_input_dict['model_input'])
+                    model_input=model_input_dict['model_input']
+                )
+
                 # update model output if onboard compute
                 if existing_run_results.capacity_provider == 'onboard' and (existing_run_results.model_output == None or existing_run_results.model_output['status'] != 'complete'):
                     model_runner = OnboardCompute(
@@ -271,6 +280,11 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
                         existing_run_results.save()
                     except:
                         return Response({'error': 'Model failed to retrieve status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                # If a run failed.
+                if existing_run_results.model_output == None or existing_run_results.model_output == 'null':
+                    return Response({'error': 'Model failed to retrieve status'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
                 # check timeframe if given maximum time for data
                 if max_age > 0:
                     now = datetime.utcnow().replace(tzinfo=utc)
