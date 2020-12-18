@@ -61,6 +61,11 @@ AWS_ACCESS_KEY_ID = ENV.str('AWS_ACCESS_KEY_ID', default='')
 AWS_SECRET_ACCESS_KEY_ID = ENV.str('AWS_SECRET_ACCESS_KEY_ID', default='')
 AWS_STORAGE_BUCKET_NAME = ENV.str('AWS_STORAGE_BUCKET_NAME', default='')
 AWS_REGION_NAME = ENV.str('AWS_REGION_NAME', default='')
+
+# AZURE SETTINGS
+AZURE_URI=ENV.str('AZURE_URI', default='')
+AZURE_FUNCTION_KEY=ENV.str('AZURE_FUNCTION_KEY', default='')
+
 # Set root for gh files
 # MEDIA_ROOT = 'app/'
 # MEDIA_URL = '/'

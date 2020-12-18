@@ -77,6 +77,8 @@ services:
             - AWS_STORAGE_BUCKET_NAME
             - AWS_REGION_NAME
             - DJANGO_API_DEFAULT_SIM_LENGTH
+            - AZURE_URI
+            - AZURE_FUNCTION_KEY
         links:
             - "postgresdb"
     model:

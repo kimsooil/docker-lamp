@@ -3,6 +3,7 @@ from datetime import datetime
 import boto3
 import urllib
 import requests
+from requests.exceptions import HTTPError
 
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
@@ -29,7 +30,10 @@ class ModelRunner:
         self.webhook_token = str(sim_run_data.webhook_token)
         #  create webhook url
         self.webhook_url = reverse(
-            'simulations-webhook', args=[self.id], request=request)
+            'simulations-webhook',
+            args=[self.id],
+            request=request
+        )
         #  determine capacity provider from the model
         self.capacity_provider = serialized_data['capacity_provider']
         self.s3_object = self.createS3Object()
@@ -44,6 +48,9 @@ class ModelRunner:
         elif self.capacity_provider == 'FARGATE_SPOT':
             model = FargateSpot(self.s3_object)
             response = model.submit()
+        elif self.capacity_provider == 'AZURE':
+            model = Azure(self.s3_object)
+            response = model.submit()
         elif self.capacity_provider == 'onboard':
             model = OnboardCompute(self.model_input)
             response = model.submit()
@@ -54,8 +61,12 @@ class ModelRunner:
         # create object to upload to S3 for fargate and spot which include additional data created in constructor
         # onboard does not need s3 object
         if self.capacity_provider != 'onboard_compute':
-            s3_dict = {'webhook_url': self.webhook_url,
-                       'capacity_provider': self.capacity_provider, 'webhook_token': self.webhook_token}
+            s3_dict = {
+                'webhook_url': self.webhook_url,
+                'capacity_provider': self.capacity_provider,
+                'webhook_token': self.webhook_token
+            }
+
             s3_dict.update(self.serialized_data)
             return s3_dict
         else:
@@ -114,6 +125,47 @@ class FargateSpot(ModelRunner):
             return Response({'success': 'Started model'}, status=status.HTTP_200_OK)
         except:
             return {'error': 'Failed to upload object to s3 - spot'}
+
+
+class Azure(ModelRunner):
+    """
+    Subclass of ModelRunner to submit a Azure Spot job with no progress to webhook
+    """
+
+    def __init__(self, az_data):
+        self.az_data = az_data
+
+    def submit(self):
+        # your json payload that contains the environment variables i.e. country, state, etc.
+        az_data_object = self.az_data
+        az_data_object['model_output'] = ""
+        for item in az_data_object['model_input'].keys():
+            az_data_object[item] = az_data_object['model_input'][item]
+
+        az_data = str(json.dumps(az_data_object))
+
+        # add timestamp as object name for anything uploaded to S3
+        key_name = datetime.now().strftime(
+            "%Y%m%d-%H%M%S.%f"
+        )[:-3] + "-ndcovid.json"
+
+        # URL to REST endpoint
+        uri = settings.AZURE_URI
+
+        # the x-functions-key header is your token
+        headers = {
+            'content-type': "application/json",
+            'x-functions-key': settings.AZURE_FUNCTION_KEY
+        }
+
+        try:
+            response = requests.post(uri, data=az_data, headers=headers)
+            if not response.status_code:
+                raise Exception
+
+            return Response({'success': 'Started model'}, status=status.HTTP_200_OK)
+        except Exception:
+            return {'error': 'Failed to upload object to azure'}
 
 
 class OnboardCompute(ModelRunner):
