@@ -17,6 +17,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 MODEL_API_BASE_URL = ENV('MODEL_API_BASE_URL',
                          default='http://localhost:5000/')
+MODEL_API_BASE_URLS = ENV.list('MODEL_API_BASE_URLS', default=[
+                         'http://localhost:5000/'])
 MODEL_API_SUBPATH = ENV('MODEL_API_SUBPATH', default='/model/')
 MODEL_API_START = ENV('MODEL_API_RESULTS',
                       default='api/v3/prediction/?')
