@@ -146,6 +146,8 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         model_input_dict = request.data
         model_input_dict['model_input'].update({'data_hash': latest_hash})
 
+        model_input_dict['model_input']['county'] = sorted(model_input_dict['model_input']['county'])
+
         # Set serializer with the input data.
         serializer = SimulationRunSerializer(
             data=model_input_dict
@@ -229,6 +231,8 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         for key, val in model_input_vals.items():
             if key != 'county':
                 model_input_vals[key] = val[0]
+
+        model_input_vals['county'] = sorted(model_input_vals['county'])
 
         # get the max age of the model input and remove from model input
         if 'max_age' in model_input_vals:
