@@ -251,6 +251,8 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
                 'data_hash': hash.hash_value
             })
 
+            print(json.dumps(model_input_dict['model_input'], indent=2))
+
             # try to find existing runs with hash values
             try:
                 existing_run_results = SimulationRun.objects.get(
