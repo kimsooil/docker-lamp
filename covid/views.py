@@ -116,8 +116,7 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             url_path='webhook', url_name='webhook')
     def handle_webhook(self, request, pk=None):
         sim_run = self.get_object()
-        print(request.data)
-        print(request.data)
+
         # validate webhook
         if str(sim_run.webhook_token) == request.data['webhook_token']:
             if not request.data.get('output'):
@@ -242,7 +241,6 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
         else:
             max_age = -1
         model_input_dict = {'model_input': model_input_vals}
-        # print(json.dumps(model_input_dict, indent=3))
 
         # get all available hashes
         hash_queryset = HashValue.objects.all().order_by('-timestamp')
@@ -359,7 +357,6 @@ class StateCountyAPIView(APIView):
 
                 # get every row
                 for row in spamreader:
-                    # print("test")
                     # reject non states
                     if row[6] in state_filter:
                         continue
