@@ -234,6 +234,15 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
 
         model_input_vals['county'] = sorted(model_input_vals['county'])
 
+        if model_input_vals['social_distancing'] == 'true':
+            model_input_vals['social_distancing'] = True
+        else:
+            model_input_vals['social_distancing'] = False
+
+        model_input_vals['quarantine_percent'] = int(model_input_vals['quarantine_percent'])
+        model_input_vals['lockdown_strength'] = float(model_input_vals['lockdown_strength'])
+        model_input_vals['social_distancing_strength'] = float(model_input_vals['social_distancing_strength'])
+
         # get the max age of the model input and remove from model input
         if 'max_age' in model_input_vals:
             max_age = int(model_input_vals['max_age'])
