@@ -75,7 +75,7 @@ class SimulationRun(models.Model):
         verbose_name_plural = _("Simulation Runs")
 
     def __str__(self):
-        return "{} - {} - [{}: {}]".format(self.user, self.timestamp, self.model_input['state'], ','.join(self.model_input['county']))
+        return "{} :: ({}) :: [{} :: {}]".format(self.user, self.timestamp, self.model_input['state'], ','.join(self.model_input['county']))
 
     def get_absolute_url(self):
         return reverse("SimulationRun_detail", kwargs={"pk": self.pk})
