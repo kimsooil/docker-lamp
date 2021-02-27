@@ -116,6 +116,7 @@ class SimulationRunViewSet(viewsets.ModelViewSet):
             url_path='webhook', url_name='webhook')
     def handle_webhook(self, request, pk=None):
         sim_run = self.get_object()
+
         # validate webhook
         if str(sim_run.webhook_token) == request.data['webhook_token']:
             if not request.data.get('output'):

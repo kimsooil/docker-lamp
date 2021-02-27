@@ -72,6 +72,7 @@ services:
             - ADMIN_PASSWORD
             - ADMIN_RESET
             - MODEL_API_BASE_URL
+            - MODEL_API_BASE_URLS
             - AWS_SECRET_ACCESS_KEY_ID
             - AWS_ACCESS_KEY_ID
             - AWS_STORAGE_BUCKET_NAME

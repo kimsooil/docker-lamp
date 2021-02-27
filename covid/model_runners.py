@@ -38,6 +38,11 @@ class ModelRunner:
         self.capacity_provider = serialized_data['capacity_provider']
         self.s3_object = self.createS3Object()
 
+        self.api_path = ''
+
+    def set_api_path(self, api_path):
+        self.api_path = api_path
+
     def submit(self):
         # submit job depending on capacity provider
         # fargate and spot submit are called in the initialization of the object
@@ -53,7 +58,17 @@ class ModelRunner:
             response = model.submit()
         elif self.capacity_provider == 'onboard':
             model = OnboardCompute(self.model_input)
-            response = model.submit()
+            encode_params = urllib.parse.urlencode(self.model_input, True)
+
+            for url in settings.MODEL_API_BASE_URLS:
+                api_path = url + settings.MODEL_API_START + str(encode_params)
+                self.set_api_path(api_path=api_path)
+                response = model.submit()
+
+                if type(response) is dict:
+                    continue
+                else:
+                    break
 
         return(response)
 
@@ -179,11 +194,12 @@ class OnboardCompute(ModelRunner):
     def submit(self):
         # encode model input, True used for list object (county)
         encode_params = urllib.parse.urlencode(self.model_input, True)
+
         # create url from settings and encoded paramaters to submit job
-        api_path = settings.MODEL_API_BASE_URL + \
-            settings.MODEL_API_START + str(encode_params)
+        api_path = settings.MODEL_API_BASE_URL + settings.MODEL_API_START + str(encode_params)
         # send get request to start the job and get response
         r = requests.get(api_path)
+
         try:
             r.raise_for_status()
         except:
@@ -195,8 +211,7 @@ class OnboardCompute(ModelRunner):
         # encode model input, True used for list object (county)
         encode_params = urllib.parse.urlencode(self.model_input, True)
         # create url from settings and encoded paramaters to get status of job
-        api_path = settings.MODEL_API_BASE_URL + \
-            settings.MODEL_API_STATUS + str(encode_params)
+        api_path = settings.MODEL_API_BASE_URL + settings.MODEL_API_STATUS + str(encode_params)
         # send get request to receive satatus for job and get response
         r = requests.get(api_path)
         r.raise_for_status()
