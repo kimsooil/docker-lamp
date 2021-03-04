@@ -23,7 +23,8 @@ class Command(BaseCommand):
             })
 
             if item.model_output and not git_hash:
-                git_hash = item.model_output['git_hash']
+                if 'git_hash' in item.model_output:
+                    git_hash = item.model_output['git_hash']
 
         today = datetime.today()
         jobs_today = SimulationRun.objects.filter(timestamp=today).count()
