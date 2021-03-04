@@ -26,10 +26,11 @@ class Command(BaseCommand):
                 if 'git_hash' in item.model_output:
                     git_hash = item.model_output['git_hash']
 
-        today = datetime.today()
-        jobs_today = SimulationRun.objects.filter(timestamp=today).count()
+        start = datetime.now().replace(hour=0, minute=0, second=0)
+        end = datetime.now().replace(hour=23, minute=59, second=59)
+        jobs_today = SimulationRun.objects.filter(timestamp__range=[start, end]).count()
 
-        body = "<strong>Jobs today:</strong> {}\n<br/><strong>Latest Git Hash:</strong> {}".format(jobs_today, git_hash)
+        body = "Jobs today: {}\nLatest Git Hash: {}".format(jobs_today, git_hash)
 
         with open('/tmp/report.csv', 'w') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=['state', 'counties', 'timestamp'])
