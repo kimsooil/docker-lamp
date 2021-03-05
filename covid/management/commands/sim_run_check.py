@@ -55,7 +55,7 @@ class Command(BaseCommand):
             subject='SEIRCast Report',
             body=body,
             to=['snjoroge@nd.edu'],
-            reply_to=['snjoroge@nd.edu'],
+            reply_to=['snjoroge@nd.edu', 'csweet1@nd.edu'],
         )
 
         with open('/tmp/report.csv') as fp:
