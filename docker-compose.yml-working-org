@@ -97,17 +97,6 @@ services:
         ports:
             #- "127.0.0.1:5000:5000"
             - "0.0.0.0:5000:5000"
-    dashboard:
-        build:
-            context: ./covid-dashboard
-            dockerfile: Dockerfile
-        depends_on:
-            - djangoweb
-        ports:
-            - 0.0.0.0:80:80
-        networks:
-            - backend
-            - frontend
 networks:
     frontend:
     backend:
